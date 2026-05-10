@@ -1,30 +1,39 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/create/create"
+    "pages/checkin/checkin",
+    "pages/tasks/tasks",
+    "pages/history/history",
+    "pages/detail/detail"
   ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "小打卡",
+    "navigationBarTextStyle": "black"
+  },
   "tabBar": {
+    "color": "#999",
+    "selectedColor": "#07C160",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "记录",
+        "pagePath": "pages/checkin/checkin",
+        "text": "打卡",
         "iconPath": "images/icons/home.png",
         "selectedIconPath": "images/icons/home-active.png"
       },
       {
-        "pagePath": "pages/create/create",
-        "text": "打卡",
+        "pagePath": "pages/tasks/tasks",
+        "text": "管理",
+        "iconPath": "images/icons/home.png",
+        "selectedIconPath": "images/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "text": "记录",
         "iconPath": "images/icons/home.png",
         "selectedIconPath": "images/icons/home-active.png"
       }
     ]
-  },
-  "window": {
-    "backgroundColor": "#F6F6F6",
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
-    "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",

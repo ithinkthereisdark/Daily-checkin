@@ -1,0 +1,22 @@
+<view class="page">
+  <view class="task-grid">
+    <block wx:for="{{tasks}}" wx:key="_id">
+      <view class="task-card {{item.isExpired ? 'expired' : ''}} {{item.isNotStarted ? 'not-started' : ''}} {{item.checkedInToday ? 'checked' : ''}}"
+            data-task="{{item}}" data-index="{{index}}" bindtap="onTapTask">
+        <view class="card-emoji">{{item.emoji}}</view>
+        <view class="card-name">{{item.name}}</view>
+        <view class="card-count">{{item.checkinCount}}/{{item.targetCount}}</view>
+        <view class="card-status">
+          <text wx:if="{{item.isExpired}}">{{item.checkinCount >= item.targetCount ? '✅ 已达成' : '已过期'}}</text>
+          <text wx:elif="{{item.isNotStarted}}">未开始</text>
+          <text wx:elif="{{item.checkedInToday}}">✓ 已打卡</text>
+          <text wx:elif="{{item.checkinCount >= item.targetCount}}">已达成</text>
+          <text wx:else>待打卡</text>
+        </view>
+        <view wx:if="{{item.needDetail}}" class="card-detail-tag">详细记录</view>
+      </view>
+    </block>
+  </view>
+
+  <view wx:if="{{tasks.length === 0}}" class="empty">还没有任务，去「管理」页创建一个吧</view>
+</view>

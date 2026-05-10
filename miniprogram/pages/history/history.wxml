@@ -1,0 +1,31 @@
+<view class="page">
+  <block wx:for="{{groups}}" wx:key="date">
+    <view class="date-group">
+      <view class="date-header">
+        <text class="date-text">{{item.date}}</text>
+        <text class="date-weekday">{{item.weekday}}</text>
+      </view>
+      <view class="checkin-list">
+        <block wx:for="{{item.checkins}}" wx:key="_id">
+          <view class="checkin-item">
+            <text class="item-emoji">{{item.taskEmoji}}</text>
+            <view class="item-body">
+              <text class="item-name">{{item.taskName}}</text>
+              <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
+              <image
+                wx:if="{{item.image}}"
+                src="{{item.image}}"
+                mode="aspectFill"
+                class="item-image"
+                data-url="{{item.image}}"
+                bindtap="previewImage">
+              </image>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{groups.length === 0}}" class="empty">还没有打卡记录</view>
+</view>
