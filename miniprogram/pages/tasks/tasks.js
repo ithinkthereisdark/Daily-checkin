@@ -100,8 +100,8 @@ Page({
   },
 
   onTargetInput(e) {
-    const v = parseInt(e.detail.value) || 1;
-    this.setData({ 'formData.targetCount': Math.max(1, v) });
+    const v = parseInt(e.detail.value) || 0;
+    this.setData({ 'formData.targetCount': Math.max(0, v) });
   },
 
   toggleNeedDetail() {
