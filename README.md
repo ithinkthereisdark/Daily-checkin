@@ -1,12 +1,53 @@
-# 云开发 quickstart
+# 花椒点点微信小程序
 
-这是云开发的快速启动指引，其中演示了如何上手使用云开发的三大基础能力：
+## Project overview
 
-- 数据库：一个既可在小程序前端操作，也能在云函数中读写的 JSON 文档型数据库
-- 文件存储：在小程序前端直接上传/下载云端文件，在云开发控制台可视化管理
-- 云函数：在云端运行的代码，微信私有协议天然鉴权，开发者只需编写业务逻辑代码
+A WeChat Mini Program (微信小程序) for task-driven daily check-in ("每日打卡"), built on WeChat Cloud Development (微信云开发). Users create tasks with emoji icons, date ranges, and target counts; the home grid shows all tasks with one-tap check-in toggle. Two-person private app — all data is filtered by nickname.
 
-## 参考文档
+## Tech stack
 
-- [云开发文档](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/basis/getting-started.html)
+- **WeChat Mini Program** (native framework, no third-party UI library)
+- **WeChat Cloud Base** (云开发): Cloud Database + Cloud Storage, no cloud functions
+- Base library version: 3.16.0 (see `project.private.config.json`)
+
+## Architecture
+
+```
+miniprogram/
+  app.js              ← Cloud init, nickname management
+  app.json            ← 4 pages, 3-tab tabBar (打卡/管理/记录)
+  app.wxss            ← Global styles
+  pages/
+    checkin/          ← Tab 1: task card grid, one-tap check-in toggle
+    tasks/            ← Tab 2: task CRUD (name, emoji picker, date range, target, detail toggle)
+    history/          ← Tab 3: check-in timeline grouped by date (read-only)
+    detail/           ← Non-tab: detailed check-in form (navigated from checkin for needDetail tasks)
+```
+
+## Data model
+
+| Collection | Fields |
+|-----------|--------|
+| `tasks` | name, emoji, startDate, endDate, targetCount, needDetail, nickName, createTime |
+| `checkins` | taskId, date (YYYY-MM-DD), nickName, description, image, createTime |
+
+Dates are stored as YYYY-MM-DD strings for simple comparison. All queries filter by `nickName` from `app.globalData.nickName`.
+
+## Key flows
+
+- **Check-in toggle**: Tap a task card → if `needDetail=false`, creates a checkin for today (or deletes existing one to cancel). If `needDetail=true`, navigates to detail page. Expired/future tasks are guarded.
+- **Task lifecycle**: `startDate` (task begins) → active period → `endDate` (task expires, greyed out, bottom of grid). `targetCount` is the check-in ceiling — hitting it blocks new check-ins but allows cancelling today's.
+- **Client-side joining**: History page fetches all tasks + all checkins, builds a taskMap, groups checkins by date. Same pattern is used by checkin page for counting.
+
+## Cloud environment
+
+- **Env ID**: `cloud1-d3geah2hy20028cb5` (hardcoded in `app.js`)
+- Collections are auto-created on first write — no manual setup needed
+- The old `records` collection from the previous version is kept but unused
+
+## Development
+
+- Open project root in **WeChat DevTools** (微信开发者工具)
+- No build commands or test infrastructure
+- Cloud functions directory (`cloudfunctions/`) is configured but empty
 
