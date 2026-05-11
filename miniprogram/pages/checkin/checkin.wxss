@@ -100,9 +100,9 @@
 }
 
 .mini-card.checked {
-  background: linear-gradient(180deg, #FFF5EC 0%, #FFF0ED 100%);
-  border-color: #FFCDD2;
-  box-shadow: 0 4rpx 16rpx rgba(255,138,128,0.12);
+  background: linear-gradient(180deg, #FFF5EC 0%, #FFF2EC 100%);
+  border-color: #F0C8B0;
+  box-shadow: 0 4rpx 16rpx rgba(232,144,92,0.12);
 }
 
 .mini-card.done {
@@ -137,13 +137,13 @@
 
 .fish-bone-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FFB74D, #FF8A80);
+  background: linear-gradient(90deg, #FFB74D, #E8905C);
   border-radius: 10rpx;
   transition: width 0.4s ease;
 }
 
 .mini-card.checked .fish-bone-fill {
-  background: linear-gradient(90deg, #FF8A80, #FFAB91);
+  background: linear-gradient(90deg, #E8905C, #F0B898);
 }
 
 .mini-card.done .fish-bone-fill {
@@ -158,12 +158,12 @@
 
 .mini-status {
   font-size: 22rpx;
-  color: #FF8A80;
+  color: #E8905C;
   font-weight: 500;
 }
 
 .mini-card.checked .mini-status {
-  color: #FF8A80;
+  color: #E8905C;
 }
 
 .mini-card.done .mini-status {
@@ -175,8 +175,8 @@
   top: 6rpx;
   right: 6rpx;
   font-size: 18rpx;
-  color: #FF8A80;
-  background: #FFF0ED;
+  color: #E8905C;
+  background: #FFF2EC;
   padding: 2rpx 8rpx;
   border-radius: 8rpx;
 }
@@ -198,7 +198,7 @@
   transform: translateX(-50%);
   width: 14rpx;
   height: 10rpx;
-  background: #FF8A80;
+  background: #E8905C;
   border-radius: 8rpx 8rpx 4rpx 4rpx;
 }
 
@@ -206,7 +206,7 @@
   position: absolute;
   width: 8rpx;
   height: 8rpx;
-  background: #FF8A80;
+  background: #E8905C;
   border-radius: 50%;
   top: 0;
 }
@@ -264,7 +264,7 @@
 
 .new-btn {
   font-size: 24rpx;
-  background: #FF8A80;
+  background: #E8905C;
   color: #fff;
   border-radius: 24rpx;
   padding: 0 24rpx;
@@ -334,14 +334,13 @@
 }
 
 .action-btn {
-  font-size: 22rpx;
-  color: #FF8A80;
-  padding: 0;
-  height: 44rpx;
-  line-height: 44rpx;
+  font-size: 24rpx;
+  color: #E8905C;
+  padding: 0 16rpx;
+  height: 56rpx;
+  line-height: 56rpx;
   border-radius: 16rpx;
   min-width: unset;
-  width: 100rpx;
   text-align: center;
   display: inline-flex;
   align-items: center;
@@ -350,7 +349,7 @@
 }
 
 .action-btn.danger {
-  color: #E57373;
+  color: #D4804A;
 }
 
 /* ====== Inline Form ====== */
@@ -436,8 +435,8 @@
 }
 
 .emoji-cell.selected {
-  border-color: #FF8A80;
-  background: #FFF0ED;
+  border-color: #E8905C;
+  background: #FFF2EC;
   transform: scale(1.1);
 }
 

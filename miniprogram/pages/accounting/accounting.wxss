@@ -56,7 +56,7 @@
 .pp-dot {
   width: 14rpx;
   height: 14rpx;
-  background: #FFAB91;
+  background: #F0B898;
   border-radius: 50%;
   animation: paw-wave 1.4s ease-in-out infinite;
 }

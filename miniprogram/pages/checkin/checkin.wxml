@@ -98,7 +98,7 @@
       </view>
       <view class="form-actions">
         <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
-        <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✧ 创建</button>
+        <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">创建</button>
       </view>
     </view>
 
@@ -168,7 +168,7 @@
             </view>
             <view class="form-actions">
               <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
-              <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✧ 保存</button>
+              <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">保存</button>
             </view>
           </view>
         </block>
