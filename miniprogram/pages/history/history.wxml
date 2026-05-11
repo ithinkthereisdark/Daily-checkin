@@ -2,8 +2,15 @@
   <block wx:for="{{groups}}" wx:key="date">
     <view class="date-group">
       <view class="date-header">
+        <view class="date-dot"></view>
         <text class="date-text">{{item.date}}</text>
         <text class="date-weekday">{{item.weekday}}</text>
+        <view class="date-paw">
+          <view class="dp-toe"></view>
+          <view class="dp-toe"></view>
+          <view class="dp-toe"></view>
+          <view class="dp-pad"></view>
+        </view>
       </view>
       <view class="checkin-list">
         <block wx:for="{{item.checkins}}" wx:key="_id">
@@ -21,11 +28,21 @@
                 bindtap="previewImage">
               </image>
             </view>
+            <!-- Fish bone decoration -->
+            <view class="item-tail">
+              <view class="tail-dot"></view>
+              <view class="tail-dot"></view>
+              <view class="tail-dot"></view>
+            </view>
           </view>
         </block>
       </view>
     </view>
   </block>
 
-  <view wx:if="{{groups.length === 0}}" class="empty">还没有打卡记录</view>
+  <view wx:if="{{groups.length === 0}}" class="empty">
+    <text class="empty-emoji">🐾</text>
+    <text class="empty-text">还没有打卡记录</text>
+    <text class="empty-hint">去打卡页开始你的第一个任务吧~</text>
+  </view>
 </view>

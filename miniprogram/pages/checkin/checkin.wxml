@@ -1,22 +1,179 @@
 <view class="page">
-  <view class="task-grid">
-    <block wx:for="{{tasks}}" wx:key="_id">
-      <view class="task-card {{item.isExpired ? 'expired' : ''}} {{item.isNotStarted ? 'not-started' : ''}} {{item.checkedInToday ? 'checked' : ''}}"
-            data-task="{{item}}" data-index="{{index}}" bindtap="onTapTask">
-        <view class="card-emoji">{{item.emoji}}</view>
-        <view class="card-name">{{item.name}}</view>
-        <view class="card-count">{{item.checkinCount}}/{{item.targetCount}}</view>
-        <view class="card-status">
-          <text wx:if="{{item.isExpired}}">{{item.checkinCount >= item.targetCount ? '✅ 已达成' : '已过期'}}</text>
-          <text wx:elif="{{item.isNotStarted}}">未开始</text>
-          <text wx:elif="{{item.checkedInToday}}">✓ 已打卡</text>
-          <text wx:elif="{{item.checkinCount >= item.targetCount}}">已达成</text>
-          <text wx:else>待打卡</text>
+
+  <!-- ====== Check-in card with cat ears ====== -->
+  <view class="checkin-card">
+    <!-- Cat ear decorations -->
+    <view class="cat-ears">
+      <view class="cat-ear ear-left"></view>
+      <view class="cat-ear ear-right"></view>
+    </view>
+
+    <view class="checkin-card-header">
+      <text class="checkin-card-title">🐱 今日打卡</text>
+      <text class="checkin-card-sub">喵~ 今天也要加油哦</text>
+    </view>
+
+    <scroll-view scroll-x class="task-strip" wx:if="{{activeTasks.length > 0}}">
+      <view class="strip-inner">
+        <block wx:for="{{activeTasks}}" wx:key="_id">
+          <view
+            class="mini-card {{item.checkedInToday ? 'checked' : ''}} {{item.checkinCount >= item.targetCount && !item.checkedInToday ? 'done' : ''}}"
+            data-task="{{item}}"
+            bindtap="onTapCheckin">
+            <!-- Paw print decoration for checked state -->
+            <view wx:if="{{item.checkedInToday}}" class="paw-print">
+              <view class="paw-pad"></view>
+              <view class="paw-toe paw-toe-1"></view>
+              <view class="paw-toe paw-toe-2"></view>
+              <view class="paw-toe paw-toe-3"></view>
+            </view>
+            <text class="mini-emoji">{{item.emoji}}</text>
+            <text class="mini-name">{{item.name}}</text>
+            <!-- Fish bone progress bar -->
+            <view class="fish-bone-bar">
+              <view class="fish-bone-fill" style="width: {{item.targetCount > 0 ? item.checkinCount / item.targetCount * 100 : 0}}%"></view>
+            </view>
+            <text class="mini-count">{{item.checkinCount}}/{{item.targetCount}}</text>
+            <view class="mini-status">
+              <text wx:if="{{item.checkedInToday}}">🐾 已打卡</text>
+              <text wx:elif="{{item.checkinCount >= item.targetCount}}">🌟 已达成</text>
+              <text wx:else>去打卡</text>
+            </view>
+            <view wx:if="{{item.needDetail}}" class="mini-detail-tag">详细</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <view wx:else class="strip-empty">
+      <text class="strip-empty-emoji">😺</text>
+      <text class="strip-empty-text">暂无待打卡任务</text>
+      <text class="strip-empty-hint">去下方新建一个吧~</text>
+    </view>
+  </view>
+
+  <!-- ====== Management card ====== -->
+  <view class="manage-card">
+    <view class="manage-card-header">
+      <text class="manage-card-title">📋 我的任务</text>
+      <button class="new-btn" size="mini" bindtap="openNewForm" disabled="{{showNewForm || editingId}}">+ 新建</button>
+    </view>
+
+    <!-- New task form -->
+    <view wx:if="{{showNewForm}}" class="inline-form">
+      <view class="form-item">
+        <input class="input" value="{{formData.name}}" bindinput="onNameInput" placeholder="🐱 任务名称，如「给猫主子铲屎」" maxlength="20"/>
+      </view>
+      <view class="form-item">
+        <text class="form-label">🎨 选择图标</text>
+        <view class="emoji-grid">
+          <block wx:for="{{emojiList}}" wx:key="*this">
+            <view class="emoji-cell {{formData.emoji === item ? 'selected' : ''}}" data-emoji="{{item}}" bindtap="selectEmoji">{{item}}</view>
+          </block>
         </view>
-        <view wx:if="{{item.needDetail}}" class="card-detail-tag">详细记录</view>
+      </view>
+      <view class="form-row">
+        <view class="form-half">
+          <text class="form-label">📅 开始日期</text>
+          <picker mode="date" value="{{formData.startDate}}" bindchange="onStartDateChange">
+            <view class="picker-val">{{formData.startDate || '请选择'}}</view>
+          </picker>
+        </view>
+        <view class="form-half">
+          <text class="form-label">📅 结束日期</text>
+          <picker mode="date" value="{{formData.endDate}}" bindchange="onEndDateChange">
+            <view class="picker-val">{{formData.endDate || '请选择'}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="form-row">
+        <view class="form-half">
+          <text class="form-label">🎯 目标次数</text>
+          <input class="input" type="number" value="{{formData.targetCount}}" bindinput="onTargetInput"/>
+        </view>
+        <view class="form-half switch-row">
+          <text class="form-label">📝 详细记录</text>
+          <switch checked="{{formData.needDetail}}" bindchange="toggleNeedDetail"/>
+        </view>
+      </view>
+      <view class="form-actions">
+        <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
+        <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✧ 创建</button>
+      </view>
+    </view>
+
+    <!-- Task list -->
+    <view wx:if="{{tasks.length === 0 && !showNewForm}}" class="empty">
+      <text class="empty-emoji">🐈</text>
+      <text>还没有任务</text>
+      <text class="empty-hint">点击「+ 新建」创建第一个任务吧~</text>
+    </view>
+
+    <block wx:for="{{tasks}}" wx:key="_id">
+      <view class="task-row {{item.isExpired ? 'expired' : ''}}">
+        <!-- Normal display -->
+        <block wx:if="{{editingId !== item._id}}">
+          <view class="task-row-inner">
+            <view class="task-info">
+              <text class="task-emoji">{{item.emoji}}</text>
+              <view class="task-body">
+                <text class="task-name">{{item.name}}</text>
+                <text class="task-meta">{{item.startDate}} ~ {{item.endDate}} · {{item.checkinCount}}/{{item.targetCount}} · {{item.needDetail ? '📝 详细' : '⚡ 快速'}}</text>
+              </view>
+            </view>
+            <view class="task-actions">
+              <button class="action-btn" size="mini" bindtap="openEditForm" data-task="{{item}}">✎ 编辑</button>
+              <button class="action-btn danger" size="mini" bindtap="deleteTask" data-task="{{item}}">✕ 删除</button>
+            </view>
+          </view>
+        </block>
+
+        <!-- Inline edit form -->
+        <block wx:else>
+          <view class="inline-form">
+            <view class="form-item">
+              <input class="input" value="{{formData.name}}" bindinput="onNameInput" placeholder="任务名称" maxlength="20"/>
+            </view>
+            <view class="form-item">
+              <text class="form-label">🎨 选择图标</text>
+              <view class="emoji-grid">
+                <block wx:for="{{emojiList}}" wx:key="*this">
+                  <view class="emoji-cell {{formData.emoji === item ? 'selected' : ''}}" data-emoji="{{item}}" bindtap="selectEmoji">{{item}}</view>
+                </block>
+              </view>
+            </view>
+            <view class="form-row">
+              <view class="form-half">
+                <text class="form-label">📅 开始日期</text>
+                <picker mode="date" value="{{formData.startDate}}" bindchange="onStartDateChange">
+                  <view class="picker-val">{{formData.startDate || '请选择'}}</view>
+                </picker>
+              </view>
+              <view class="form-half">
+                <text class="form-label">📅 结束日期</text>
+                <picker mode="date" value="{{formData.endDate}}" bindchange="onEndDateChange">
+                  <view class="picker-val">{{formData.endDate || '请选择'}}</view>
+                </picker>
+              </view>
+            </view>
+            <view class="form-row">
+              <view class="form-half">
+                <text class="form-label">🎯 目标次数</text>
+                <input class="input" type="number" value="{{formData.targetCount}}" bindinput="onTargetInput"/>
+              </view>
+              <view class="form-half switch-row">
+                <text class="form-label">📝 详细记录</text>
+                <switch checked="{{formData.needDetail}}" bindchange="toggleNeedDetail"/>
+              </view>
+            </view>
+            <view class="form-actions">
+              <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
+              <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✧ 保存</button>
+            </view>
+          </view>
+        </block>
       </view>
     </block>
   </view>
 
-  <view wx:if="{{tasks.length === 0}}" class="empty">还没有任务，去「管理」页创建一个吧</view>
 </view>

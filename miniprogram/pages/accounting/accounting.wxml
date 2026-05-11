@@ -1,0 +1,16 @@
+<view class="page">
+  <view class="placeholder">
+    <view class="cat-coin">
+      <text class="cat-coin-emoji">🐱</text>
+      <text class="coin-emoji">💴</text>
+    </view>
+    <text class="placeholder-text">记账功能即将上线</text>
+    <text class="placeholder-sub">喵~ 猫猫正在努力做窝中</text>
+    <view class="placeholder-paws">
+      <view class="pp-dot"></view>
+      <view class="pp-dot"></view>
+      <view class="pp-dot"></view>
+      <view class="pp-dot"></view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,72 @@
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cat-coin {
+  position: relative;
+  margin-bottom: 40rpx;
+}
+
+.cat-coin-emoji {
+  font-size: 120rpx;
+  display: block;
+}
+
+.coin-emoji {
+  font-size: 40rpx;
+  position: absolute;
+  top: -10rpx;
+  right: -20rpx;
+  animation: coin-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes coin-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12rpx); }
+}
+
+.placeholder-text {
+  font-size: 32rpx;
+  color: #5D4037;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+
+.placeholder-sub {
+  font-size: 26rpx;
+  color: #BCAAA4;
+  margin-bottom: 36rpx;
+}
+
+/* Paw print loading dots */
+.placeholder-paws {
+  display: flex;
+  gap: 16rpx;
+}
+
+.pp-dot {
+  width: 14rpx;
+  height: 14rpx;
+  background: #FFAB91;
+  border-radius: 50%;
+  animation: paw-wave 1.4s ease-in-out infinite;
+}
+
+.pp-dot:nth-child(1) { animation-delay: 0s; }
+.pp-dot:nth-child(2) { animation-delay: 0.2s; }
+.pp-dot:nth-child(3) { animation-delay: 0.4s; }
+.pp-dot:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes paw-wave {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-16rpx); opacity: 1; }
+}

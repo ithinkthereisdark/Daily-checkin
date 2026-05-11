@@ -1,10 +1,16 @@
 <view class="page">
   <view wx:if="{{task}}" class="task-header">
     <text class="task-emoji">{{task.emoji}}</text>
-    <text class="task-name">{{task.name}}</text>
+    <view class="task-title-group">
+      <text class="task-name">{{task.name}}</text>
+      <text class="task-hint">喵~ 记录一下今天的内容吧</text>
+    </view>
   </view>
 
-  <view wx:if="{{isUpdate}}" class="notice">今日已打卡，再次提交将更新记录</view>
+  <view wx:if="{{isUpdate}}" class="notice">
+    <text class="notice-emoji">🐾</text>
+    <text>今日已打卡，再次提交将更新记录</text>
+  </view>
 
   <view class="form">
     <textarea
@@ -22,13 +28,13 @@
 
     <view class="btn-group">
       <button type="default" bindtap="chooseImage" class="img-btn">
-        {{imagePath ? '更换照片' : '添加照片'}}
+        {{imagePath ? '📷 更换照片' : '📷 添加照片'}}
       </button>
     </view>
 
     <view class="btn-group">
       <button type="primary" bindtap="submit" loading="{{uploading}}" disabled="{{uploading}}">
-        {{isUpdate ? '更新记录' : '提交打卡'}}
+        {{isUpdate ? '🐾 更新记录' : '✧ 提交打卡'}}
       </button>
     </view>
   </view>

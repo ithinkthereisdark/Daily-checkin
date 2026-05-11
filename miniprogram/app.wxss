@@ -1,26 +1,46 @@
 /**app.wxss**/
+
+/* ===== Cat Cream Theme — Global ===== */
+
+page {
+  --cream: #FFF5EC;
+  --warm-white: #FFFBF7;
+  --cat-nose: #FF8A80;
+  --cat-eyes: #FFB74D;
+  --toe-bean: #FFAB91;
+  --dark-fur: #5D4037;
+  --soft-fur: #BCAAA4;
+  --warm-border: #F0E8E0;
+  --warm-bg2: #F5F0EB;
+  --pale-amber: #FFF8E1;
+  --success-fur: #BF8C4A;
+
+  background-color: var(--cream);
+  font-size: 16px;
+  color: var(--dark-fur);
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
-} 
+}
 
 button {
   background: initial;
 }
 
-button:focus{
+button:focus {
   outline: 0;
 }
 
-button::after{
+button::after {
   border: none;
 }
 
-
-page {
-  background-color: #FFF5EC;
-  font-size: 16px;
-  color: #5D4037;
+/* Override WeChat primary button */
+button[type="primary"] {
+  background: #FF8A80;
+  border-radius: 28rpx;
 }

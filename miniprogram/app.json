@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/checkin/checkin",
-    "pages/tasks/tasks",
+    "pages/accounting/accounting",
     "pages/history/history",
     "pages/detail/detail"
   ],
@@ -20,20 +20,20 @@
       {
         "pagePath": "pages/checkin/checkin",
         "text": "打卡",
-        "iconPath": "images/icons/home.png",
-        "selectedIconPath": "images/icons/home-active.png"
+        "iconPath": "images/icons/checkin.png",
+        "selectedIconPath": "images/icons/checkin-active.png"
       },
       {
-        "pagePath": "pages/tasks/tasks",
-        "text": "管理",
-        "iconPath": "images/icons/home.png",
-        "selectedIconPath": "images/icons/home-active.png"
+        "pagePath": "pages/accounting/accounting",
+        "text": "记账",
+        "iconPath": "images/icons/accounting.png",
+        "selectedIconPath": "images/icons/accounting-active.png"
       },
       {
         "pagePath": "pages/history/history",
         "text": "记录",
-        "iconPath": "images/icons/home.png",
-        "selectedIconPath": "images/icons/home-active.png"
+        "iconPath": "images/icons/history.png",
+        "selectedIconPath": "images/icons/history-active.png"
       }
     ]
   },
