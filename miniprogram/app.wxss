@@ -20,7 +20,7 @@ button::after{
 
 
 page {
-  background-color: #f8f8f8;
+  background-color: #FFF5EC;
   font-size: 16px;
-  color: #333;
+  color: #5D4037;
 }

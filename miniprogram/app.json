@@ -7,13 +7,15 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "小打卡",
+    "navigationBarBackgroundColor": "#FFF5EC",
+    "navigationBarTitleText": "花椒点点",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "color": "#999",
-    "selectedColor": "#07C160",
+    "color": "#BCAAA4",
+    "selectedColor": "#FF8A80",
+    "backgroundColor": "#FFFBF7",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/checkin/checkin",

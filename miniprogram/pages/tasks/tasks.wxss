@@ -6,28 +6,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
 }
 
 .header-title {
   font-size: 36rpx;
-  font-weight: bold;
+  font-weight: 700;
+  color: #5D4037;
 }
 
 .empty {
   text-align: center;
-  color: #888;
+  color: #BCAAA4;
   margin-top: 200rpx;
 }
 
 .task-item {
-  background: #fff;
-  border-radius: 12rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 16rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2rpx 12rpx rgba(180,140,120,0.06);
 }
 
 .task-info {
@@ -50,13 +52,14 @@
 
 .task-name {
   font-size: 30rpx;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 6rpx;
+  color: #5D4037;
 }
 
 .task-meta {
   font-size: 22rpx;
-  color: #999;
+  color: #BCAAA4;
 }
 
 .task-actions {
@@ -68,19 +71,23 @@
 
 .action-btn {
   font-size: 22rpx;
+  color: #FF8A80;
 }
 
 .action-btn.danger {
-  color: #e74c3c;
+  color: #E57373;
 }
 
 .add-btn {
   font-size: 24rpx;
+  background: #FF8A80;
+  color: #fff;
 }
 
 .cancel-btn {
   font-size: 24rpx;
-  background: #eee;
+  background: #F5F0EB;
+  color: #8D7B72;
 }
 
 .form {
@@ -100,28 +107,31 @@
 .label {
   display: block;
   font-size: 28rpx;
-  color: #555;
+  color: #8D7B72;
   margin-bottom: 10rpx;
 }
 
 .input {
   width: 100%;
   height: 80rpx;
-  background: #fff;
-  border-radius: 12rpx;
+  background: #FFFBF7;
+  border-radius: 14rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
+  color: #5D4037;
   box-sizing: border-box;
+  border: 2rpx solid #F0E8E0;
 }
 
 .picker-val {
   height: 80rpx;
-  background: #fff;
-  border-radius: 12rpx;
+  background: #FFFBF7;
+  border-radius: 14rpx;
   padding: 0 20rpx;
   line-height: 80rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #5D4037;
+  border: 2rpx solid #F0E8E0;
 }
 
 .emoji-grid {
@@ -131,18 +141,18 @@
 }
 
 .emoji-cell {
-  width: 68rpx;
-  height: 68rpx;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
-  background: #fff;
-  border-radius: 12rpx;
-  border: 2rpx solid transparent;
+  font-size: 38rpx;
+  background: #FFFBF7;
+  border-radius: 14rpx;
+  border: 2rpx solid #F0E8E0;
 }
 
 .emoji-cell.selected {
-  border-color: #07C160;
-  background: #eafaf1;
+  border-color: #FF8A80;
+  background: #FFF0ED;
 }

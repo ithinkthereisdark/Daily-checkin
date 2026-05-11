@@ -9,14 +9,14 @@
 }
 
 .task-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx 20rpx;
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  padding: 34rpx 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  box-shadow: 0 4rpx 16rpx rgba(180,140,120,0.10);
   transition: transform 0.15s;
 }
 
@@ -25,51 +25,52 @@
 }
 
 .card-emoji {
-  font-size: 64rpx;
-  margin-bottom: 12rpx;
+  font-size: 68rpx;
+  margin-bottom: 14rpx;
 }
 
 .card-name {
   font-size: 28rpx;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 8rpx;
+  color: #5D4037;
 }
 
 .card-count {
   font-size: 24rpx;
-  color: #888;
+  color: #BCAAA4;
   margin-bottom: 8rpx;
 }
 
 .card-status {
   font-size: 22rpx;
-  color: #07C160;
+  color: #FF8A80;
 }
 
 .task-card.expired {
-  opacity: 0.5;
-  background: #f5f5f5;
+  opacity: 0.45;
+  background: #F5F0EB;
 }
 
 .task-card.expired .card-status {
-  color: #999;
+  color: #BCAAA4;
 }
 
 .task-card.not-started {
-  border: 1rpx dashed #ddd;
+  border: 2rpx dashed #E0D5CC;
 }
 
 .task-card.not-started .card-status {
-  color: #bbb;
+  color: #C9BFB5;
 }
 
 .task-card.checked {
-  background: #eafaf1;
+  background: #FFF0ED;
 }
 
 .task-card.checked .card-status {
-  color: #07C160;
-  font-weight: 500;
+  color: #FF8A80;
+  font-weight: 600;
 }
 
 .card-detail-tag {
@@ -77,14 +78,14 @@
   top: 8rpx;
   right: 8rpx;
   font-size: 20rpx;
-  color: #07C160;
-  background: #eafaf1;
-  padding: 2rpx 10rpx;
-  border-radius: 6rpx;
+  color: #FF8A80;
+  background: #FFF0ED;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
 }
 
 .empty {
   text-align: center;
-  color: #888;
+  color: #BCAAA4;
   margin-top: 200rpx;
 }
