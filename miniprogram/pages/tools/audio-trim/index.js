@@ -31,65 +31,28 @@ Page({
   // ========== Audio Selection ==========
 
   chooseAudio() {
-    wx.chooseMedia({
+    wx.chooseMessageFile({
       count: 1,
-      mediaType: ['audio'],
-      sourceType: ['album'],
+      type: 'file',
+      extension: ['mp3', 'aac', 'wav', 'm4a', 'flac', 'ogg', 'wma'],
       success: (res) => {
-        const file = res.tempFiles[0];
-        if (file.duration > 600) {
-          wx.showToast({ title: '暂不支持超过10分钟的音频', icon: 'none' });
-          return;
-        }
+        const f = res.tempFiles[0];
         this._destroyAudio();
-        const duration = file.duration || 0;
         this.setData({
           step: 'selected',
-          fileName: file.tempFilePath.split('/').pop() || '未命名音频',
-          filePath: file.tempFilePath,
-          duration: duration,
+          fileName: f.name,
+          filePath: f.path,
+          duration: 0,
           currentTime: 0,
           isPlaying: false,
           trimStart: 0,
-          trimEnd: duration,
+          trimEnd: 0,
           isPreviewing: false,
           resultFileID: '',
           resultTempPath: '',
           isResultPlaying: false
         });
-        this._initAudioContext(file.tempFilePath);
-      },
-      fail: () => {
-        // wx.chooseMedia may fail on some devices; fallback to chooseMessageFile
-        wx.chooseMessageFile({
-          count: 1,
-          type: 'file',
-          success: (res) => {
-            const f = res.tempFiles[0];
-            const nameLC = f.name.toLowerCase();
-            const isAudio = nameLC.endsWith('.mp3') || nameLC.endsWith('.aac') || nameLC.endsWith('.wav') || nameLC.endsWith('.m4a');
-            if (!isAudio) {
-              wx.showToast({ title: '请选择音频文件', icon: 'none' });
-              return;
-            }
-            this._destroyAudio();
-            this.setData({
-              step: 'selected',
-              fileName: f.name,
-              filePath: f.path,
-              duration: 0,
-              currentTime: 0,
-              isPlaying: false,
-              trimStart: 0,
-              trimEnd: 0,
-              isPreviewing: false,
-              resultFileID: '',
-              resultTempPath: '',
-              isResultPlaying: false
-            });
-            this._initAudioContext(f.path);
-          }
-        });
+        this._initAudioContext(f.path);
       }
     });
   },
@@ -102,7 +65,6 @@ Page({
     ctx.onTimeUpdate(() => {
       const t = ctx.currentTime;
       this.setData({ currentTime: t });
-      // Auto-stop at trimEnd when previewing
       if (this.data.isPreviewing && t >= this.data.trimEnd) {
         ctx.pause();
         this.setData({ isPreviewing: false, isPlaying: false });
@@ -112,11 +74,7 @@ Page({
       this.setData({ isPlaying: false, isPreviewing: false });
     });
     ctx.onCanplay(() => {
-      // Get actual duration once loaded if not already known
-      const d = ctx.duration;
-      if (d && d > 0 && this.data.duration === 0) {
-        this.setData({ duration: d, trimEnd: d });
-      }
+      this._pollDuration();
     });
     ctx.onError((err) => {
       console.error('Audio error:', err);
@@ -124,6 +82,24 @@ Page({
       this.setData({ isPlaying: false, isPreviewing: false });
     });
     this._audioCtx = ctx;
+    // Start polling immediately — onCanplay may fire before duration is available
+    this._pollDuration();
+  },
+
+  _pollDuration(retries) {
+    retries = retries || 15;
+    const ctx = this._audioCtx;
+    if (!ctx) return;
+    const d = ctx.duration;
+    if (d && d > 0 && !isNaN(d)) {
+      if (this.data.duration === 0) {
+        this.setData({ duration: d, trimEnd: d });
+      }
+      return;
+    }
+    if (retries > 0) {
+      setTimeout(() => this._pollDuration(retries - 1), 300);
+    }
   },
 
   togglePlay() {
@@ -132,13 +108,47 @@ Page({
       this._audioCtx.pause();
       this.setData({ isPlaying: false });
     } else {
-      this._audioCtx.seek(this.data.trimStart);
+      // Resume from current position, or seek to trimStart if at the end
+      if (this._audioCtx.currentTime >= this.data.trimEnd || this._audioCtx.currentTime < this.data.trimStart) {
+        this._audioCtx.seek(Math.max(this.data.trimStart, 0));
+      }
       this._audioCtx.play();
       this.setData({ isPlaying: true });
     }
   },
 
+  // Progress bar seek for playback
+  onProgressChanging(e) {
+    const v = e.detail.value;
+    this.setData({ currentTime: v });
+  },
+
+  onProgressChange(e) {
+    const v = e.detail.value;
+    if (this._audioCtx) {
+      this._audioCtx.seek(v);
+    }
+    this.setData({ currentTime: v });
+  },
+
+  // Catch touchmove to prevent page scroll on mobile
+  noop() {},
+
   // ========== Sliders ==========
+
+  onStartSliderChanging(e) {
+    const v = e.detail.value;
+    if (v < this.data.trimEnd) {
+      this.setData({ trimStart: v });
+    }
+  },
+
+  onEndSliderChanging(e) {
+    const v = e.detail.value;
+    if (v > this.data.trimStart) {
+      this.setData({ trimEnd: v });
+    }
+  },
 
   onStartSliderChange(e) {
     const v = e.detail.value;
@@ -185,9 +195,11 @@ Page({
     wx.showLoading({ title: '上传中...' });
 
     try {
-      // Upload original file to cloud storage
+      // Upload original file to cloud storage (sanitize path)
+      const ext = (this.data.fileName.split('.').pop() || 'mp3').replace(/[^a-z0-9]/gi, '');
+      const cloudPath = `audio-trim/input/${Date.now()}.${ext}`;
       const uploadRes = await wx.cloud.uploadFile({
-        cloudPath: `audio-trim/input/${Date.now()}_${this.data.fileName}`,
+        cloudPath: cloudPath,
         filePath: this.data.filePath
       });
 
@@ -255,29 +267,25 @@ Page({
     }
   },
 
-  // ========== Save to Local ==========
+  // ========== Save / Share ==========
 
   saveToLocal() {
-    if (!this.data.resultFileID) return;
-    wx.showLoading({ title: '保存中...' });
-    wx.cloud.downloadFile({ fileID: this.data.resultFileID })
-      .then(res => {
-        wx.hideLoading();
-        wx.saveFile({
-          tempFilePath: res.tempFilePath,
-          success: () => {
-            wx.showToast({ title: '已保存到本地', icon: 'success' });
-          },
-          fail: (err) => {
-            console.error('Save failed:', err);
-            wx.showToast({ title: '保存失败', icon: 'none' });
-          }
-        });
-      })
-      .catch(() => {
-        wx.hideLoading();
-        wx.showToast({ title: '下载失败', icon: 'none' });
-      });
+    const tempPath = this.data.resultTempPath;
+    if (!tempPath) {
+      wx.showToast({ title: '文件尚未就绪', icon: 'none' });
+      return;
+    }
+    wx.openDocument({
+      filePath: tempPath,
+      showMenu: true,
+      success: () => {
+        wx.showToast({ title: '可通过右上角菜单保存', icon: 'none' });
+      },
+      fail: (err) => {
+        console.error('打开失败:', err);
+        wx.showToast({ title: '打开失败，请重试', icon: 'none' });
+      }
+    });
   },
 
   // ========== Cleanup ==========

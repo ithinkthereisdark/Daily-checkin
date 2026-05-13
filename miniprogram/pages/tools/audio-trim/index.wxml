@@ -14,7 +14,7 @@
   <view wx:if="{{step === 'idle'}}" class="upload-zone" bindtap="chooseAudio">
     <text class="upload-icon">🎤</text>
     <text class="upload-title">选择音频文件</text>
-    <text class="upload-hint">支持从聊天记录或本地选择</text>
+    <text class="upload-hint">从本地文件中选择音频</text>
     <text class="upload-formats">MP3 · AAC · WAV · M4A</text>
   </view>
 
@@ -31,12 +31,28 @@
     </view>
 
     <!-- Playback card -->
-    <view class="playback-card">
+    <view class="playback-card" catchtouchmove="noop">
       <view class="playback-row">
         <button class="play-btn {{isPlaying ? 'playing' : ''}}" bindtap="togglePlay">
           {{isPlaying ? '⏸' : '▶'}}
         </button>
-        <text class="current-time-display">{{util.formatDuration(currentTime)}}</text>
+        <view class="time-and-progress">
+          <text class="current-time-display">{{util.formatDuration(currentTime)}} / {{util.formatDuration(duration)}}</text>
+          <view class="progress-wrap" catchtouchmove="noop">
+            <slider
+              min="0"
+              max="{{duration}}"
+              value="{{currentTime}}"
+              step="0.5"
+              bindchanging="onProgressChanging"
+              bindchange="onProgressChange"
+              block-size="18"
+              activeColor="#E8905C"
+              backgroundColor="#F5F0EB"
+              catchtouchmove="noop"
+            />
+          </view>
+        </view>
       </view>
     </view>
 
@@ -49,35 +65,39 @@
         <text class="trim-length-text">片段时长: {{util.formatDuration(trimEnd - trimStart)}}</text>
       </view>
 
-      <view class="slider-group">
+      <view class="slider-group" catchtouchmove="noop">
         <text class="slider-label">起始</text>
-        <view class="slider-wrap">
+        <view class="slider-wrap" catchtouchmove="noop">
           <slider
             min="0"
             max="{{duration}}"
             value="{{trimStart}}"
             step="0.5"
             bindchange="onStartSliderChange"
+            bindchanging="onStartSliderChanging"
             block-size="22"
             activeColor="#E8905C"
             backgroundColor="#F5F0EB"
+            catchtouchmove="noop"
           />
           <text class="slider-val">{{util.formatDuration(trimStart)}}</text>
         </view>
       </view>
 
-      <view class="slider-group">
+      <view class="slider-group" catchtouchmove="noop">
         <text class="slider-label">结束</text>
-        <view class="slider-wrap">
+        <view class="slider-wrap" catchtouchmove="noop">
           <slider
             min="0"
             max="{{duration}}"
             value="{{trimEnd}}"
             step="0.5"
             bindchange="onEndSliderChange"
+            bindchanging="onEndSliderChanging"
             block-size="22"
             activeColor="#E8905C"
             backgroundColor="#F5F0EB"
+            catchtouchmove="noop"
           />
           <text class="slider-val">{{util.formatDuration(trimEnd)}}</text>
         </view>

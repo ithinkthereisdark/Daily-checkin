@@ -6,8 +6,18 @@ const fs = require('fs');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-// ffmpeg binary is bundled alongside index.js
-const FFMPEG = path.join(__dirname, 'ffmpeg');
+// Copy ffmpeg to /tmp/ where we can set +x (code dir is read-only)
+const FFMPEG_SRC = path.join(__dirname, 'ffmpeg');
+const FFMPEG = path.join(os.tmpdir(), 'ffmpeg');
+
+(function initFfmpeg() {
+  try {
+    if (!fs.existsSync(FFMPEG)) {
+      fs.copyFileSync(FFMPEG_SRC, FFMPEG);
+      fs.chmodSync(FFMPEG, 0o755);
+    }
+  } catch (_) {}
+})();
 
 exports.main = async (event, context) => {
   const { fileID, startTime, endTime, fileName } = event;
@@ -31,13 +41,15 @@ exports.main = async (event, context) => {
     const downloadRes = await cloud.downloadFile({ fileID });
     fs.writeFileSync(inputFile, downloadRes.fileContent);
 
-    // 2. Execute ffmpeg trim — try stream copy first, fallback to re-encode
-    const cmd = `${FFMPEG} -i "${inputFile}" -ss ${startTime} -to ${endTime} -c copy -y "${outputFile}"`;
+    // 2. Execute ffmpeg trim
+    // First try stream copy with keyframe alignment (fast + lossless)
+    const copyCmd = `${FFMPEG} -i "${inputFile}" -ss ${startTime} -to ${endTime} -c copy -avoid_negative_ts make_zero -y "${outputFile}"`;
     try {
-      execSync(cmd, { timeout: 30000, stdio: 'pipe' });
+      execSync(copyCmd, { timeout: 30000, stdio: 'pipe' });
     } catch (_) {
-      const fallback = `${FFMPEG} -i "${inputFile}" -ss ${startTime} -to ${endTime} -c:a aac -b:a 192k -y "${outputFile}"`;
-      execSync(fallback, { timeout: 30000, stdio: 'pipe' });
+      // Fallback: re-encode with high quality
+      const reencodeCmd = `${FFMPEG} -i "${inputFile}" -ss ${startTime} -to ${endTime} -c:a aac -b:a 320k -y "${outputFile}"`;
+      execSync(reencodeCmd, { timeout: 30000, stdio: 'pipe' });
     }
 
     // 3. Upload result to cloud storage
