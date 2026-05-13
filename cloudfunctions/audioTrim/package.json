@@ -1,0 +1,9 @@
+{
+  "name": "audioTrim",
+  "version": "1.0.0",
+  "description": "Audio trimming cloud function",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

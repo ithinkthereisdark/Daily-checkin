@@ -3,7 +3,9 @@
     "pages/checkin/checkin",
     "pages/accounting/accounting",
     "pages/history/history",
-    "pages/detail/detail"
+    "pages/detail/detail",
+    "pages/tools/tools",
+    "pages/tools/audio-trim/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -34,6 +36,12 @@
         "text": "记录",
         "iconPath": "images/icons/history.png",
         "selectedIconPath": "images/icons/history-active.png"
+      },
+      {
+        "pagePath": "pages/tools/tools",
+        "text": "小工具",
+        "iconPath": "images/icons/tools.png",
+        "selectedIconPath": "images/icons/tools-active.png"
       }
     ]
   },

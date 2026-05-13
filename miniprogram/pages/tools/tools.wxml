@@ -1,0 +1,28 @@
+<view class="page">
+
+  <!-- ====== Header ====== -->
+  <view class="tools-header">
+    <text class="tools-title">🧰 实用小工具</text>
+    <text class="tools-sub">喵~ 选择需要的工具吧</text>
+  </view>
+
+  <!-- ====== Tool Cards ====== -->
+  <view class="tools-list">
+    <view class="tool-card" bindtap="openAudioTrim" hover-class="tool-card-hover">
+      <view class="tool-icon-wrap">
+        <text class="tool-icon">🎵</text>
+      </view>
+      <view class="tool-info">
+        <text class="tool-name">音频剪辑</text>
+        <text class="tool-desc">选择音频，自由裁剪片段</text>
+      </view>
+      <text class="tool-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ====== Footer ====== -->
+  <view class="tools-footer">
+    <text class="footer-hint">更多工具即将上线 🐾</text>
+  </view>
+
+</view>

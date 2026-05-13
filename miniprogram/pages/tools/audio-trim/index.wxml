@@ -1,0 +1,120 @@
+<wxs module="util">
+  function formatDuration(s) {
+    if (!s && s !== 0) return '0:00';
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' + sec : sec);
+  }
+  module.exports = { formatDuration: formatDuration };
+</wxs>
+
+<view class="page">
+
+  <!-- ====== State: Idle (no file selected) ====== -->
+  <view wx:if="{{step === 'idle'}}" class="upload-zone" bindtap="chooseAudio">
+    <text class="upload-icon">🎤</text>
+    <text class="upload-title">选择音频文件</text>
+    <text class="upload-hint">支持从聊天记录或本地选择</text>
+    <text class="upload-formats">MP3 · AAC · WAV · M4A</text>
+  </view>
+
+  <!-- ====== State: Selected (file loaded, trim UI active) ====== -->
+  <block wx:elif="{{step === 'selected' || step === 'processing' || step === 'done'}}">
+
+    <!-- Audio info bar -->
+    <view class="audio-info-bar">
+      <view class="audio-file-info">
+        <text class="audio-filename">{{fileName}}</text>
+        <text class="audio-duration">总时长: {{util.formatDuration(duration)}}</text>
+      </view>
+      <button class="change-file-btn" size="mini" bindtap="chooseAudio">更换</button>
+    </view>
+
+    <!-- Playback card -->
+    <view class="playback-card">
+      <view class="playback-row">
+        <button class="play-btn {{isPlaying ? 'playing' : ''}}" bindtap="togglePlay">
+          {{isPlaying ? '⏸' : '▶'}}
+        </button>
+        <text class="current-time-display">{{util.formatDuration(currentTime)}}</text>
+      </view>
+    </view>
+
+    <!-- Trim range controls -->
+    <view class="trim-card">
+      <text class="trim-label">✂️ 裁剪范围</text>
+
+      <view class="trim-range-display">
+        <text class="trim-range-text">{{util.formatDuration(trimStart)}} — {{util.formatDuration(trimEnd)}}</text>
+        <text class="trim-length-text">片段时长: {{util.formatDuration(trimEnd - trimStart)}}</text>
+      </view>
+
+      <view class="slider-group">
+        <text class="slider-label">起始</text>
+        <view class="slider-wrap">
+          <slider
+            min="0"
+            max="{{duration}}"
+            value="{{trimStart}}"
+            step="0.5"
+            bindchange="onStartSliderChange"
+            block-size="22"
+            activeColor="#E8905C"
+            backgroundColor="#F5F0EB"
+          />
+          <text class="slider-val">{{util.formatDuration(trimStart)}}</text>
+        </view>
+      </view>
+
+      <view class="slider-group">
+        <text class="slider-label">结束</text>
+        <view class="slider-wrap">
+          <slider
+            min="0"
+            max="{{duration}}"
+            value="{{trimEnd}}"
+            step="0.5"
+            bindchange="onEndSliderChange"
+            block-size="22"
+            activeColor="#E8905C"
+            backgroundColor="#F5F0EB"
+          />
+          <text class="slider-val">{{util.formatDuration(trimEnd)}}</text>
+        </view>
+      </view>
+
+      <!-- Preview trimmed segment -->
+      <button class="preview-btn" bindtap="previewTrim">
+        {{isPreviewing ? '⏹ 停止预览' : '🔊 预览裁剪片段'}}
+      </button>
+    </view>
+
+    <!-- Action: trim -->
+    <view class="action-card">
+      <button
+        class="trim-btn"
+        bindtap="startTrim"
+        loading="{{isProcessing}}"
+        disabled="{{isProcessing}}">
+        ✂️ 开始裁剪
+      </button>
+    </view>
+
+    <!-- ====== Result ====== -->
+    <view wx:if="{{step === 'done' && resultFileID}}" class="result-card">
+      <text class="result-title">✅ 裁剪完成</text>
+      <view class="result-actions">
+        <button
+          class="play-result-btn {{isResultPlaying ? 'playing' : ''}}"
+          bindtap="toggleResultPlay">
+          {{isResultPlaying ? '⏸ 暂停' : '▶ 播放结果'}}
+        </button>
+        <button class="save-btn" bindtap="saveToLocal">
+          💾 保存到本地
+        </button>
+      </view>
+    </view>
+
+  </block>
+
+</view>
