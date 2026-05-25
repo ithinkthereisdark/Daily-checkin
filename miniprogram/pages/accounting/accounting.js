@@ -10,6 +10,8 @@ Page({
     currentLedger: null,
     monthKey: '',
     monthDisplay: '',
+    displayYear: '',
+    displayMonth: '',
     monthStart: '',
     monthEnd: '',
     groupedTransactions: [],
@@ -42,6 +44,8 @@ Page({
     this.setData({
       monthKey,
       monthDisplay: `${year}年${month}月`,
+      displayYear: `${year}`,
+      displayMonth: `${month}月`,
       monthStart,
       monthEnd
     });
@@ -199,6 +203,8 @@ Page({
     this.setData({
       monthKey,
       monthDisplay: `${year}年${parseInt(month)}月`,
+      displayYear: year,
+      displayMonth: `${parseInt(month)}月`,
       monthStart,
       monthEnd
     });

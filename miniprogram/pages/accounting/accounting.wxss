@@ -35,26 +35,41 @@
 .top-row2 {
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 .month-picker {
-  font-size: 26rpx;
-  color: #8D7B72;
-  font-weight: 500;
-  padding: 6rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.mp-year {
+  font-size: 24rpx;
+  color: #BCAAA4;
+  font-weight: 400;
+}
+
+.mp-month {
+  font-size: 34rpx;
+  color: #5D4037;
+  font-weight: 700;
 }
 
 .summary {
   display: flex;
-  gap: 28rpx;
+  flex: 1;
+  justify-content: space-around;
+  padding-left: 16rpx;
 }
 
 .summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rpx;
+  gap: 4rpx;
 }
 
 .summary-label {
@@ -67,6 +82,7 @@
   font-size: 30rpx;
   font-weight: 700;
   color: #5D4037;
+  white-space: nowrap;
 }
 
 .summary-value.income {
@@ -98,14 +114,16 @@
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 14rpx;
-  padding: 0 8rpx;
+  padding: 0 20rpx 0 8rpx;
 }
 
 .date-left {
   display: flex;
   align-items: baseline;
   gap: 10rpx;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .date-dot {
@@ -118,30 +136,37 @@
 }
 
 .date-text {
-  font-size: 30rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: #5D4037;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .date-weekday {
   font-size: 22rpx;
   color: #BCAAA4;
+  flex-shrink: 0;
 }
 
 .date-summary {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
   font-size: 22rpx;
   font-weight: 600;
   flex-shrink: 0;
+  padding: 0 20rpx 0 8rpx;
 }
 
 .day-income {
   color: #2E7D32;
+  white-space: nowrap;
 }
 
 .day-expense {
   color: #C62828;
+  white-space: nowrap;
 }
 
 /* Transaction Card */
@@ -155,9 +180,9 @@
 .tx-row {
   display: flex;
   align-items: center;
-  padding: 20rpx 24rpx;
+  padding: 22rpx 24rpx;
   border-bottom: 1rpx solid #F5F0EB;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .tx-row:last-child {
@@ -169,9 +194,9 @@
 }
 
 .tx-emoji {
-  font-size: 40rpx;
+  font-size: 38rpx;
   flex-shrink: 0;
-  width: 52rpx;
+  width: 48rpx;
   text-align: center;
 }
 
@@ -197,26 +222,29 @@
   white-space: nowrap;
 }
 
+.tx-divider {
+  width: 1rpx;
+  height: 36rpx;
+  background: #E0D5CC;
+  flex-shrink: 0;
+}
+
 .tx-amount {
   font-size: 28rpx;
   font-weight: 600;
   flex-shrink: 0;
-  padding: 8rpx 20rpx;
-  border-radius: 10rpx;
-  border: 2rpx solid #F0E8E0;
-  min-width: 120rpx;
-  text-align: center;
+  padding: 8rpx 0 8rpx 12rpx;
+  min-width: 150rpx;
+  text-align: left;
   box-sizing: border-box;
 }
 
 .tx-amount.income {
   color: #2E7D32;
-  border-color: #C8E6C9;
 }
 
 .tx-amount.expense {
   color: #C62828;
-  border-color: #FFCDD2;
 }
 
 /* ======== FAB ======== */

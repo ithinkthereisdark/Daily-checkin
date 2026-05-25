@@ -7,20 +7,23 @@
     </view>
     <view class="top-row2">
       <picker mode="date" fields="month" value="{{monthKey}}" bindchange="selectMonth">
-        <view class="month-picker">{{monthDisplay}} ▼</view>
+        <view class="month-picker">
+          <text class="mp-year">{{displayYear}}</text>
+          <text class="mp-month">{{displayMonth}} ▼</text>
+        </view>
       </picker>
       <view class="summary">
         <view class="summary-item">
-          <text class="summary-label">收</text>
-          <text class="summary-value income">{{monthlyIncome}}</text>
+          <text class="summary-label">收入</text>
+          <text class="summary-value income">¥{{monthlyIncome}}</text>
         </view>
         <view class="summary-item">
-          <text class="summary-label">支</text>
-          <text class="summary-value expense">{{monthlyExpense}}</text>
+          <text class="summary-label">支出</text>
+          <text class="summary-value expense">¥{{monthlyExpense}}</text>
         </view>
         <view class="summary-item">
-          <text class="summary-label">余</text>
-          <text class="summary-value">{{monthlyBalance}}</text>
+          <text class="summary-label">余额</text>
+          <text class="summary-value">¥{{monthlyBalance}}</text>
         </view>
       </view>
     </view>
@@ -42,8 +45,8 @@
           <text class="date-weekday">{{item.weekday}}</text>
         </view>
         <view class="date-summary">
-          <text wx:if="{{item.dayIncome > 0}}" class="day-income">收 {{item.dayIncome}}</text>
-          <text wx:if="{{item.dayExpense > 0}}" class="day-expense">支 {{item.dayExpense}}</text>
+          <text wx:if="{{item.dayIncome > 0}}" class="day-income">收 ¥{{item.dayIncome}}</text>
+          <text wx:if="{{item.dayExpense > 0}}" class="day-expense">支 ¥{{item.dayExpense}}</text>
         </view>
       </view>
 
@@ -61,6 +64,7 @@
             <text class="tx-category">{{tx.category}}</text>
             <text wx:if="{{tx.description}}" class="tx-desc">{{tx.description}}</text>
           </view>
+          <view class="tx-divider"></view>
           <text class="tx-amount {{tx.type}}">{{tx.type === 'income' ? '+' : '-'}}{{tx.amount}}</text>
         </view>
       </view>
