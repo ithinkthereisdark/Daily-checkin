@@ -1,0 +1,103 @@
+<view class="page">
+  <!-- Ledger Selector -->
+  <view class="ledger-row" bindtap="toggleLedgerPicker">
+    <text wx:if="{{!currentLedger}}" class="no-ledger">请选择账本</text>
+    <text wx:else>{{currentLedger.emoji}} {{currentLedger.name}}</text>
+    <text class="ledger-arrow">▼</text>
+  </view>
+
+  <!-- Type Toggle -->
+  <view class="type-toggle">
+    <view class="type-tab {{type === 'expense' ? 'active expense' : ''}}" data-type="expense" bindtap="switchType">支出</view>
+    <view class="type-tab {{type === 'income' ? 'active income' : ''}}" data-type="income" bindtap="switchType">收入</view>
+  </view>
+
+  <!-- Category Grid -->
+  <view class="section-title">选择分类</view>
+  <view class="category-grid">
+    <view
+      class="cat-cell {{selectedCategory === item.name ? 'selected' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="name"
+      data-name="{{item.name}}"
+      data-emoji="{{item.emoji}}"
+      bindtap="selectCategory"
+    >
+      <text class="cat-emoji">{{item.emoji}}</text>
+      <text class="cat-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- Description & Date -->
+  <view class="meta-row">
+    <input
+      class="desc-input"
+      placeholder="添加备注..."
+      value="{{description}}"
+      bindinput="onDescInput"
+      maxlength="50"
+    />
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="date-picker">📅 {{date}}</view>
+    </picker>
+  </view>
+
+  <!-- Amount Display -->
+  <view class="amount-section">
+    <view class="amount-expr">
+      <text wx:if="{{expression || currentInput}}">{{expression}}{{currentInput}}</text>
+      <text wx:else class="amount-placeholder">0</text>
+    </view>
+    <view class="amount-result">= {{result}}</view>
+  </view>
+
+  <!-- Keypad -->
+  <view class="keypad">
+    <view class="key-row">
+      <view class="key num" data-key="7" bindtap="tapKey">7</view>
+      <view class="key num" data-key="8" bindtap="tapKey">8</view>
+      <view class="key num" data-key="9" bindtap="tapKey">9</view>
+      <view class="key op" data-key="+" bindtap="tapKey">+</view>
+    </view>
+    <view class="key-row">
+      <view class="key num" data-key="4" bindtap="tapKey">4</view>
+      <view class="key num" data-key="5" bindtap="tapKey">5</view>
+      <view class="key num" data-key="6" bindtap="tapKey">6</view>
+      <view class="key op" data-key="-" bindtap="tapKey">-</view>
+    </view>
+    <view class="key-row">
+      <view class="key num" data-key="1" bindtap="tapKey">1</view>
+      <view class="key num" data-key="2" bindtap="tapKey">2</view>
+      <view class="key num" data-key="3" bindtap="tapKey">3</view>
+      <view class="key fn" data-key="C" bindtap="tapKey">C</view>
+    </view>
+    <view class="key-row">
+      <view class="key num" data-key="." bindtap="tapKey">.</view>
+      <view class="key num" data-key="0" bindtap="tapKey">0</view>
+      <view class="key fn" data-key="backspace" bindtap="tapKey">⌫</view>
+      <view class="key done" data-key="done" bindtap="tapKey">完成</view>
+    </view>
+  </view>
+
+  <!-- Delete Button (edit mode) -->
+  <view wx:if="{{isEdit}}" class="delete-section">
+    <view class="delete-btn" bindtap="deleteTransaction">删除此记录</view>
+  </view>
+
+  <!-- Ledger Picker Overlay -->
+  <view class="picker-overlay" wx:if="{{showLedgerPicker}}" bindtap="toggleLedgerPicker">
+    <view class="picker-content" catchtap>
+      <view class="picker-title">选择账本</view>
+      <view
+        class="picker-item {{currentLedger._id === item._id ? 'active' : ''}}"
+        wx:for="{{ledgers}}"
+        wx:key="_id"
+        data-id="{{item._id}}"
+        bindtap="switchLedger"
+      >
+        <text>{{item.emoji}} {{item.name}}</text>
+        <text wx:if="{{currentLedger._id === item._id}}" class="check-mark">✓</text>
+      </view>
+    </view>
+  </view>
+</view>

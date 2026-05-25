@@ -1,0 +1,312 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #FFF5EC;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+/* ======== Ledger Row ======== */
+.ledger-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #5D4037;
+  padding: 16rpx 0;
+  margin-bottom: 12rpx;
+}
+
+.ledger-row .no-ledger {
+  color: #BCAAA4;
+}
+
+.ledger-arrow {
+  font-size: 18rpx;
+  color: #BCAAA4;
+}
+
+/* ======== Type Toggle ======== */
+.type-toggle {
+  display: flex;
+  background: #F5F0EB;
+  border-radius: 22rpx;
+  padding: 6rpx;
+  margin-bottom: 20rpx;
+}
+
+.type-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8D7B72;
+  border-radius: 18rpx;
+  transition: all 0.2s;
+}
+
+.type-tab.active {
+  color: #fff;
+}
+
+.type-tab.active.expense {
+  background: #E8905C;
+}
+
+.type-tab.active.income {
+  background: #4CAF50;
+}
+
+/* ======== Category Grid ======== */
+.section-title {
+  font-size: 26rpx;
+  color: #8D7B72;
+  margin-bottom: 12rpx;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.cat-cell {
+  width: calc(25% - 9rpx);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 16rpx 4rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
+  border: 2rpx solid #F0E8E0;
+  box-sizing: border-box;
+}
+
+.cat-cell.selected {
+  border-color: #E8905C;
+  background: #FFF2EC;
+}
+
+.cat-cell:active {
+  transform: scale(0.94);
+}
+
+.cat-emoji {
+  font-size: 36rpx;
+}
+
+.cat-name {
+  font-size: 22rpx;
+  color: #5D4037;
+}
+
+/* ======== Description & Date ======== */
+.meta-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.desc-input {
+  flex: 1;
+  height: 72rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
+  border: 2rpx solid #F0E8E0;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+  color: #5D4037;
+  box-sizing: border-box;
+}
+
+.date-picker {
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 16rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
+  border: 2rpx solid #F0E8E0;
+  font-size: 26rpx;
+  color: #5D4037;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* ======== Amount Display ======== */
+.amount-section {
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(180,140,120,0.06);
+}
+
+.amount-expr {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #5D4037;
+  text-align: right;
+  min-height: 56rpx;
+  line-height: 56rpx;
+  word-break: break-all;
+}
+
+.amount-placeholder {
+  color: #C9BFB5;
+}
+
+.amount-result {
+  font-size: 28rpx;
+  color: #BCAAA4;
+  text-align: right;
+  margin-top: 4rpx;
+}
+
+/* ======== Keypad ======== */
+.keypad {
+  background: #FFFBF7;
+  border-radius: 24rpx;
+  padding: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(180,140,120,0.06);
+}
+
+.key-row {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.key-row:last-child {
+  margin-bottom: 0;
+}
+
+.key {
+  flex: 1;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.key:active {
+  transform: scale(0.94);
+}
+
+.key.num {
+  background: #FFFBF7;
+  color: #5D4037;
+  border: 2rpx solid #F0E8E0;
+}
+
+.key.op {
+  background: #FFF2EC;
+  color: #E8905C;
+  font-size: 40rpx;
+}
+
+.key.fn {
+  background: #F5F0EB;
+  color: #8D7B72;
+  font-size: 30rpx;
+}
+
+.key.done {
+  background: #E8905C;
+  color: #fff;
+  font-size: 28rpx;
+}
+
+/* ======== Delete Section ======== */
+.delete-section {
+  margin-top: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.delete-btn {
+  text-align: center;
+  padding: 22rpx 0;
+  font-size: 28rpx;
+  color: #D4804A;
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  border: 2rpx solid #F0E8E0;
+}
+
+.delete-btn:active {
+  background: #FFF5EC;
+}
+
+/* ======== Ledger Picker Overlay ======== */
+.picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.picker-content {
+  width: 100%;
+  background: #FFFBF7;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 0 28rpx 40rpx;
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.picker-title {
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5D4037;
+  padding: 28rpx 0 20rpx;
+}
+
+.picker-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22rpx 16rpx;
+  font-size: 28rpx;
+  color: #5D4037;
+  border-radius: 16rpx;
+  margin-bottom: 4rpx;
+}
+
+.picker-item.active {
+  background: #FFF2EC;
+  color: #E8905C;
+  font-weight: 600;
+}
+
+.picker-item:active {
+  background: #FFF5EC;
+}
+
+.check-mark {
+  color: #E8905C;
+  font-weight: 700;
+}
