@@ -203,7 +203,100 @@ Page({
   },
 
   drawTrendChart() {
-    // Will be implemented in Task 3
+    const { trendData } = this.data;
+    if (!trendData.length) return;
+
+    const query = wx.createSelectorQuery();
+    query.select('#trendCanvas').fields({ node: true, size: true }).exec(res => {
+      if (!res[0] || !res[0].node) return;
+      const canvas = res[0].node;
+      const ctx = canvas.getContext('2d');
+      const dpr = wx.getSystemInfoSync().pixelRatio;
+      const width = res[0].width;
+      const height = res[0].height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const pad = { top: 20, right: 16, bottom: 40, left: 44 };
+      const chartW = width - pad.left - pad.right;
+      const chartH = height - pad.top - pad.bottom;
+
+      // Find max value for Y axis
+      let maxVal = 0;
+      trendData.forEach(d => {
+        if (d.income > maxVal) maxVal = d.income;
+        if (d.expense > maxVal) maxVal = d.expense;
+      });
+      if (maxVal === 0) maxVal = 100;
+      maxVal = maxVal * 1.15;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw Y axis gridlines
+      const gridLines = 4;
+      ctx.strokeStyle = '#F0E8E0';
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([4, 4]);
+      for (let i = 0; i <= gridLines; i++) {
+        const y = pad.top + (chartH / gridLines) * i;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(width - pad.right, y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // Draw bars
+      const barGap = 4;
+      const groupWidth = chartW / trendData.length;
+      const barW = (groupWidth - barGap * 3) / 2;
+
+      trendData.forEach((d, i) => {
+        const gx = pad.left + groupWidth * i;
+
+        // Expense bar (red, left side of group)
+        const expH = (d.expense / maxVal) * chartH;
+        ctx.fillStyle = '#C62828';
+        ctx.fillRect(gx + barGap, pad.top + chartH - expH, barW, expH);
+
+        // Income bar (green, right side of group)
+        const incH = (d.income / maxVal) * chartH;
+        ctx.fillStyle = '#2E7D32';
+        ctx.fillRect(gx + barGap * 2 + barW, pad.top + chartH - incH, barW, incH);
+
+        // Month label below bar
+        ctx.fillStyle = '#8D7B72';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d.month, gx + groupWidth / 2, height - 6);
+      });
+
+      // Y axis labels
+      ctx.fillStyle = '#BCAAA4';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= gridLines; i++) {
+        const val = Math.round(maxVal - (maxVal / gridLines) * i);
+        const y = pad.top + (chartH / gridLines) * i;
+        ctx.fillText(String(val), pad.left - 6, y + 3);
+      }
+
+      // Legend (top right)
+      const lx = width - pad.right - 80;
+      ctx.fillStyle = '#2E7D32';
+      ctx.fillRect(lx, 4, 12, 12);
+      ctx.fillStyle = '#5D4037';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('收入', lx + 16, 14);
+
+      ctx.fillStyle = '#C62828';
+      ctx.fillRect(lx + 48, 4, 12, 12);
+      ctx.fillStyle = '#5D4037';
+      ctx.fillText('支出', lx + 64, 14);
+    });
   },
 
   drawPieChart() {
