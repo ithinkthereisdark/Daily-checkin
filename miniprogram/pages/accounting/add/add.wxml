@@ -16,16 +16,24 @@
   <view class="section-title">选择分类</view>
   <view class="category-grid">
     <view
-      class="cat-cell {{selectedCategory === item.name ? 'selected' : ''}}"
+      class="cat-cell {{selectedCategory === item.name ? 'selected' : ''}} {{item._id ? 'custom' : ''}}"
       wx:for="{{categories}}"
       wx:key="name"
       data-name="{{item.name}}"
       data-emoji="{{item.emoji}}"
+      data-id="{{item._id || ''}}"
       bindtap="selectCategory"
+      bindlongpress="deleteCategory"
     >
       <text class="cat-emoji">{{item.emoji}}</text>
       <text class="cat-name">{{item.name}}</text>
     </view>
+  </view>
+
+  <!-- + 新增分类按钮 -->
+  <view class="add-cat-btn" data-type="{{type}}" bindtap="openCategoryForm">
+    <text class="add-cat-icon">+</text>
+    <text class="add-cat-text">新增分类</text>
   </view>
 
   <!-- Description & Date -->
@@ -82,6 +90,33 @@
   <!-- Delete Button (edit mode) -->
   <view wx:if="{{isEdit}}" class="delete-section">
     <view class="delete-btn" bindtap="deleteTransaction">删除此记录</view>
+  </view>
+
+  <!-- Add Category Bottom Sheet -->
+  <view class="sheet-overlay" wx:if="{{showCategoryForm}}" bindtap="closeCategoryForm">
+    <view class="sheet-content" catchtap>
+      <view class="sheet-handle"></view>
+      <view class="form-title">新增分类</view>
+
+      <view class="type-toggle small">
+        <view class="type-tab {{categoryFormType === 'expense' ? 'active expense' : ''}}" data-type="expense" bindtap="openCategoryForm">支出</view>
+        <view class="type-tab {{categoryFormType === 'income' ? 'active income' : ''}}" data-type="income" bindtap="openCategoryForm">收入</view>
+      </view>
+
+      <view class="form-label">选择图标</view>
+      <view class="emoji-grid">
+        <block wx:for="{{['🍽️','🚌','🛍️','🏠','🎮','💊','📚','📱','👗','💄','🏃','🐱','🎁','💼','📌','💰','📈','📋','↩️','💵','🎵','🌱','💻','❤️','⭐','🔥','✅','📅','🎓','🎯']}}" wx:key="*this">
+          <view class="emoji-cell {{newCategoryEmoji === item ? 'selected' : ''}}" data-emoji="{{item}}" bindtap="selectCategoryEmoji">{{item}}</view>
+        </block>
+      </view>
+
+      <input class="form-input" placeholder="分类名称" value="{{newCategoryName}}" bindinput="onCategoryNameInput" maxlength="8"/>
+
+      <view class="form-actions">
+        <view class="form-btn cancel" bindtap="closeCategoryForm">取消</view>
+        <view class="form-btn confirm" bindtap="saveCategory">确定</view>
+      </view>
+    </view>
   </view>
 
   <!-- Ledger Picker Overlay -->

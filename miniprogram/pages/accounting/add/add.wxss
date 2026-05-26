@@ -310,3 +310,145 @@
   color: #E8905C;
   font-weight: 700;
 }
+
+/* Add Category Button */
+.add-cat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  padding: 16rpx 0;
+  margin-top: 8rpx;
+  border-radius: 14rpx;
+  border: 2rpx dashed #E0D5CC;
+  background: transparent;
+}
+
+.add-cat-icon {
+  font-size: 28rpx;
+  color: #E8905C;
+  font-weight: 700;
+}
+
+.add-cat-text {
+  font-size: 24rpx;
+  color: #E8905C;
+  font-weight: 600;
+}
+
+/* Custom category cell */
+.cat-cell.custom:active {
+  opacity: 0.7;
+}
+
+/* Sheet Overlay */
+.sheet-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet-content {
+  width: 100%;
+  background: #FFFBF7;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 0 28rpx 40rpx;
+}
+
+.sheet-handle {
+  width: 60rpx;
+  height: 6rpx;
+  background: #E0D5CC;
+  border-radius: 3rpx;
+  margin: 16rpx auto 24rpx;
+}
+
+.form-title {
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5D4037;
+  padding: 0 0 20rpx;
+}
+
+.type-toggle.small {
+  margin-bottom: 16rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #8D7B72;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.emoji-cell {
+  width: 62rpx;
+  height: 62rpx;
+  font-size: 34rpx;
+  background: #FFFBF7;
+  border-radius: 14rpx;
+  border: 2rpx solid #F0E8E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-cell.selected {
+  border-color: #E8905C;
+  background: #FFF2EC;
+  transform: scale(1.1);
+}
+
+.form-input {
+  height: 72rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
+  border: 2rpx solid #F0E8E0;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+  color: #5D4037;
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.form-btn {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.form-btn.cancel {
+  background: #F5F0EB;
+  color: #8D7B72;
+}
+
+.form-btn.confirm {
+  background: #E8905C;
+  color: #fff;
+}
+
+.form-btn:active {
+  opacity: 0.8;
+}
