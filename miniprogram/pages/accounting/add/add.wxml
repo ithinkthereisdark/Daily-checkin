@@ -23,7 +23,7 @@
       data-emoji="{{item.emoji}}"
       data-id="{{item._id || ''}}"
       bindtap="selectCategory"
-      bindlongpress="deleteCategory"
+      bindlongpress="{{item._id ? 'deleteCategory' : ''}}"
     >
       <text class="cat-emoji">{{item.emoji}}</text>
       <text class="cat-name">{{item.name}}</text>
