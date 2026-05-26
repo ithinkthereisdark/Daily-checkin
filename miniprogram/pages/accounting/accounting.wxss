@@ -247,31 +247,50 @@
   color: #C62828;
 }
 
-/* ======== FAB ======== */
-.fab {
+/* ======== FAB Group ======== */
+.fab-group {
   position: fixed;
   bottom: 120rpx;
   right: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  z-index: 20;
+}
+
+.fab {
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: #E8905C;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8rpx 24rpx rgba(232,144,92,0.4);
-  z-index: 20;
-}
-
-.fab text {
-  font-size: 56rpx;
-  color: #fff;
-  line-height: 1;
 }
 
 .fab:active {
   transform: scale(0.92);
   transition: transform 0.15s;
+}
+
+.fab-add {
+  background: #E8905C;
+}
+
+.fab-add text {
+  font-size: 56rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+.fab-stats {
+  background: #FFFBF7;
+  border: 2rpx solid #E8905C;
+}
+
+.fab-icon {
+  font-size: 40rpx;
+  line-height: 1;
 }
 
 /* ======== Empty State ======== */

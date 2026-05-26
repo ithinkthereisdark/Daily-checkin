@@ -328,6 +328,11 @@ Page({
     });
   },
 
+  goStats() {
+    const ledgerId = this.data.currentLedger ? this.data.currentLedger._id : '';
+    wx.navigateTo({ url: `/pages/accounting/stats/stats?ledgerId=${ledgerId}` });
+  },
+
   goAdd() {
     const ledgerId = this.data.currentLedger ? this.data.currentLedger._id : '';
     wx.navigateTo({ url: `/pages/accounting/add/add?ledgerId=${ledgerId}` });

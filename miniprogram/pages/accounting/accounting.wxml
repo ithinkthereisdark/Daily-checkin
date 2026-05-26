@@ -78,9 +78,14 @@
     <text class="loading-text">加载中...</text>
   </view>
 
-  <!-- FAB -->
-  <view class="fab" bindtap="goAdd">
-    <text>+</text>
+  <!-- FAB Group -->
+  <view class="fab-group">
+    <view class="fab fab-stats" bindtap="goStats">
+      <text class="fab-icon">📊</text>
+    </view>
+    <view class="fab fab-add" bindtap="goAdd">
+      <text>+</text>
+    </view>
   </view>
 
   <!-- Detail Bottom Sheet -->
