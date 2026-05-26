@@ -75,6 +75,7 @@ Page({
 
       this.setData({ tasks: merged, activeTasks, loading: false });
       if (onComplete) onComplete();
+      this.checkAllDoneAndCelebrate();
     }).catch(err => {
       console.error('加载数据失败', err);
       this.setData({ loading: false });
@@ -130,11 +131,7 @@ Page({
         }
       }).then(() => { wx.showToast({ title: '已打卡', icon: 'success' }); })
         .catch(() => { wx.showToast({ title: '打卡失败', icon: 'none' }); })
-        .finally(() => {
-          this.loadData(() => {
-            this.checkAllDoneAndCelebrate();
-          });
-        });
+        .finally(() => { this.loadData(); });
     }
   },
 
