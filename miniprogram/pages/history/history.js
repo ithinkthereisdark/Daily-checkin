@@ -75,6 +75,7 @@ Page({
 
     const dateStats = {};
     allCheckins.forEach(c => {
+      if (!taskMap[c.taskId]) return;
       if (!dateStats[c.date]) dateStats[c.date] = { checkinTaskIds: new Set() };
       dateStats[c.date].checkinTaskIds.add(c.taskId);
     });
