@@ -1,0 +1,77 @@
+<view class="page">
+  <!-- Top Bar -->
+  <view class="top-bar">
+    <view class="top-row1">
+      <text>{{currentLedger.emoji}} {{currentLedger.name}}</text>
+    </view>
+    <view class="top-row2">
+      <view class="summary">
+        <view class="summary-item">
+          <text class="summary-label">收入</text>
+          <text class="summary-value income">¥{{totalIncome}}</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">支出</text>
+          <text class="summary-value expense">¥{{totalExpense}}</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">结余</text>
+          <text class="summary-value">¥{{totalBalance}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Time Range Tabs -->
+  <view class="range-tabs">
+    <view class="range-tab {{range === 'month' ? 'active' : ''}}" data-range="month" bindtap="switchRange">当月</view>
+    <view class="range-tab {{range === 'quarter' ? 'active' : ''}}" data-range="quarter" bindtap="switchRange">季度</view>
+    <view class="range-tab {{range === 'half' ? 'active' : ''}}" data-range="half" bindtap="switchRange">半年</view>
+    <view class="range-tab {{range === 'year' ? 'active' : ''}}" data-range="year" bindtap="switchRange">全年</view>
+  </view>
+
+  <scroll-view scroll-y class="main-scroll">
+    <!-- Trend Bar Chart -->
+    <view class="section">
+      <text class="section-title">📊 收支趋势</text>
+      <canvas type="2d" id="trendCanvas" class="chart-canvas bar-chart"></canvas>
+    </view>
+
+    <!-- Category Ranking -->
+    <view class="section">
+      <text class="section-title">{{rankType === 'expense' ? '📉' : '📈'}} 分类排行</text>
+      <view class="rank-toggle">
+        <view class="rank-tab {{rankType === 'expense' ? 'active' : ''}}" data-type="expense" bindtap="switchRankType">支出</view>
+        <view class="rank-tab {{rankType === 'income' ? 'active' : ''}}" data-type="income" bindtap="switchRankType">收入</view>
+      </view>
+      <view class="rank-list">
+        <view class="rank-item" wx:for="{{rankList}}" wx:key="category">
+          <text class="rank-emoji">{{item.emoji}}</text>
+          <text class="rank-name">{{item.category}}</text>
+          <view class="rank-bar-wrap">
+            <view class="rank-bar" style="width: {{item.percent}}%"></view>
+          </view>
+          <text class="rank-amount">¥{{item.amount}}</text>
+        </view>
+        <view wx:if="{{rankList.length === 0}}" class="rank-empty">暂无数据</view>
+      </view>
+    </view>
+
+    <!-- Pie Chart -->
+    <view class="section">
+      <text class="section-title">🍕 分类占比</text>
+      <view class="pie-wrap">
+        <canvas type="2d" id="pieCanvas" class="chart-canvas pie-chart"></canvas>
+        <view class="pie-legend" wx:if="{{pieData.length > 0}}">
+          <view class="legend-item" wx:for="{{pieData}}" wx:key="category" wx:for-item="p">
+            <view class="legend-dot" style="background: {{p.color}}"></view>
+            <text class="legend-name">{{p.category}}</text>
+            <text class="legend-pct">{{p.percent}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="scroll-bottom"></view>
+  </scroll-view>
+</view>

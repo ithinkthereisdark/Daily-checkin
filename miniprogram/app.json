@@ -6,7 +6,8 @@
     "pages/detail/detail",
     "pages/tools/tools",
     "pages/tools/audio-trim/index",
-    "pages/accounting/add/add"
+    "pages/accounting/add/add",
+    "pages/accounting/stats/stats"
   ],
   "window": {
     "backgroundTextStyle": "light",

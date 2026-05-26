@@ -1,0 +1,227 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #FFF5EC;
+}
+
+.top-bar {
+  background: #FFFBF7;
+  flex-shrink: 0;
+  box-shadow: 0 2rpx 12rpx rgba(180,140,120,0.06);
+  padding: 16rpx 24rpx 14rpx;
+}
+
+.top-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5D4037;
+  padding: 4rpx 0 12rpx;
+}
+
+.top-row2 {
+  display: flex;
+}
+
+.summary {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.summary-label {
+  font-size: 22rpx;
+  color: #8D7B72;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5D4037;
+}
+
+.summary-value.income { color: #2E7D32; }
+.summary-value.expense { color: #C62828; }
+
+.range-tabs {
+  display: flex;
+  background: #FFFBF7;
+  padding: 12rpx 24rpx;
+  gap: 12rpx;
+  flex-shrink: 0;
+  border-top: 1rpx solid #F5F0EB;
+}
+
+.range-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10rpx 0;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #8D7B72;
+  background: #F5F0EB;
+}
+
+.range-tab.active {
+  background: #E8905C;
+  color: #fff;
+  font-weight: 600;
+}
+
+.main-scroll {
+  flex: 1;
+  height: 0;
+  padding: 16rpx 20rpx;
+}
+
+.scroll-bottom {
+  height: 40rpx;
+}
+
+.section {
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5D4037;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.chart-canvas {
+  width: 100%;
+}
+
+.bar-chart {
+  height: 360rpx;
+}
+
+.pie-chart {
+  width: 360rpx;
+  height: 360rpx;
+  margin: 0 auto;
+}
+
+/* Rank */
+.rank-toggle {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.rank-tab {
+  padding: 6rpx 20rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  color: #8D7B72;
+  background: #F5F0EB;
+}
+
+.rank-tab.active {
+  background: #E8905C;
+  color: #fff;
+}
+
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.rank-emoji {
+  font-size: 28rpx;
+  width: 40rpx;
+  text-align: center;
+}
+
+.rank-name {
+  font-size: 24rpx;
+  color: #5D4037;
+  width: 80rpx;
+  flex-shrink: 0;
+}
+
+.rank-bar-wrap {
+  flex: 1;
+  height: 16rpx;
+  background: #F5F0EB;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.rank-bar {
+  height: 100%;
+  background: #E8905C;
+  border-radius: 8rpx;
+  transition: width 0.4s ease;
+}
+
+.rank-amount {
+  font-size: 24rpx;
+  color: #5D4037;
+  font-weight: 600;
+  width: 100rpx;
+  text-align: right;
+}
+
+.rank-empty {
+  text-align: center;
+  color: #BCAAA4;
+  font-size: 24rpx;
+  padding: 30rpx 0;
+}
+
+/* Pie */
+.pie-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pie-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx 20rpx;
+  justify-content: center;
+  margin-top: 16rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 22rpx;
+  color: #5D4037;
+}
+
+.legend-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 4rpx;
+}
+
+.legend-pct {
+  color: #BCAAA4;
+}
