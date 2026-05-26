@@ -23,6 +23,7 @@ Page({
     tasks: [],
     activeTasks: [],
     loading: false,
+    showCelebration: false,
 
     // Management form state
     showNewForm: false,
@@ -36,7 +37,7 @@ Page({
     this.loadData();
   },
 
-  loadData() {
+  loadData(onComplete) {
     this.setData({ loading: true });
     const nickName = app.globalData.nickName;
     const today = todayStr();
@@ -73,6 +74,7 @@ Page({
       const activeTasks = merged.filter(t => !t.isExpired && !t.isNotStarted);
 
       this.setData({ tasks: merged, activeTasks, loading: false });
+      if (onComplete) onComplete();
     }).catch(err => {
       console.error('加载数据失败', err);
       this.setData({ loading: false });
@@ -128,7 +130,11 @@ Page({
         }
       }).then(() => { wx.showToast({ title: '已打卡', icon: 'success' }); })
         .catch(() => { wx.showToast({ title: '打卡失败', icon: 'none' }); })
-        .finally(() => { this.loadData(); });
+        .finally(() => {
+          this.loadData(() => {
+            this.checkAllDoneAndCelebrate();
+          });
+        });
     }
   },
 
@@ -276,5 +282,108 @@ Page({
           });
       }
     });
-  }
+  },
+
+  checkAllDoneAndCelebrate() {
+    const { activeTasks } = this.data;
+    if (!activeTasks.length) return;
+    const allDone = activeTasks.every(t => t.checkedInToday);
+    if (allDone) {
+      this.setData({ showCelebration: true });
+      setTimeout(() => this.startCelebration(), 300);
+    }
+  },
+
+  startCelebration() {
+    const query = wx.createSelectorQuery();
+    query.select('#celebrationCanvas').fields({ node: true, size: true }).exec(res => {
+      if (!res[0] || !res[0].node) return;
+      const canvas = res[0].node;
+      const ctx = canvas.getContext('2d');
+      const dpr = wx.getSystemInfoSync().pixelRatio;
+      const width = res[0].width;
+      const height = res[0].height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      const pawEmoji = '🐾';
+      const particles = [];
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: -20 - Math.random() * height * 0.3,
+          size: 20 + Math.random() * 24,
+          speed: 1.2 + Math.random() * 2,
+          opacity: 0.6 + Math.random() * 0.4,
+          sway: (Math.random() - 0.5) * 2,
+          swaySpeed: 0.02 + Math.random() * 0.03,
+          rotation: (Math.random() - 0.5) * 0.4,
+          delay: i * 60
+        });
+      }
+
+      const startTime = Date.now();
+      const duration = 2500;
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+
+        if (elapsed > duration) {
+          const fadeProgress = (elapsed - duration) / 400;
+          if (fadeProgress >= 1) {
+            ctx.restore();
+            this.setData({ showCelebration: false });
+            return;
+          }
+          ctx.clearRect(0, 0, width, height);
+          ctx.globalAlpha = 1 - fadeProgress;
+          particles.forEach(p => {
+            if (elapsed - p.delay < 0) return;
+            const pElapsed = (elapsed - p.delay) / 1000;
+            const py = -20 + p.speed * 60 * pElapsed;
+            const px = p.x + Math.sin(pElapsed * p.swaySpeed * 60) * 15;
+            if (py < height + 40) {
+              ctx.save();
+              ctx.globalAlpha = p.opacity * (1 - fadeProgress);
+              ctx.font = `${p.size}px sans-serif`;
+              ctx.translate(px, py);
+              ctx.rotate(p.rotation);
+              ctx.fillText(pawEmoji, -p.size / 2, p.size / 2);
+              ctx.restore();
+            }
+          });
+          canvas.requestAnimationFrame(animate);
+          return;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(p => {
+          const pElapsed = Math.max(0, (elapsed - p.delay) / 1000);
+          if (pElapsed <= 0) return;
+          const py = -20 + p.speed * 60 * pElapsed;
+          const px = p.x + Math.sin(pElapsed * p.swaySpeed * 60) * 15;
+
+          if (py < height + 40) {
+            ctx.save();
+            ctx.globalAlpha = p.opacity;
+            ctx.font = `${p.size}px sans-serif`;
+            ctx.translate(px, py);
+            ctx.rotate(p.rotation + pElapsed * 0.3);
+            ctx.fillText(pawEmoji, -p.size / 2, p.size / 2);
+            ctx.restore();
+          }
+        });
+
+        canvas.requestAnimationFrame(animate);
+      };
+
+      canvas.requestAnimationFrame(animate);
+    });
+  },
+
 });

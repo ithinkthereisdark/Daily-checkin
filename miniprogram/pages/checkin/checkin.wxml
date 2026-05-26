@@ -176,4 +176,12 @@
     </block>
   </view>
 
+  <!-- Celebration Canvas Overlay -->
+  <canvas
+    wx:if="{{showCelebration}}"
+    type="2d"
+    id="celebrationCanvas"
+    class="celebration-canvas"
+  ></canvas>
+
 </view>
