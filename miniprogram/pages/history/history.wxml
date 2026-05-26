@@ -1,48 +1,108 @@
 <view class="page">
-  <block wx:for="{{groups}}" wx:key="date">
-    <view class="date-group">
-      <view class="date-header">
-        <view class="date-dot"></view>
-        <text class="date-text">{{item.date}}</text>
-        <text class="date-weekday">{{item.weekday}}</text>
-        <view class="date-paw">
-          <view class="dp-toe"></view>
-          <view class="dp-toe"></view>
-          <view class="dp-toe"></view>
-          <view class="dp-pad"></view>
+  <!-- View Toggle -->
+  <view class="view-toggle">
+    <view class="toggle-tab {{viewMode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchView">日视图</view>
+    <view class="toggle-tab {{viewMode === 'month' ? 'active' : ''}}" data-mode="month" bindtap="switchView">月视图</view>
+  </view>
+
+  <!-- ========== Month View ========== -->
+  <view wx:if="{{viewMode === 'month'}}" class="month-view">
+    <view class="month-nav">
+      <view class="month-arrow" bindtap="prevMonth">◀</view>
+      <text class="month-label">{{monthDisplay}}</text>
+      <view class="month-arrow" bindtap="nextMonth">▶</view>
+    </view>
+
+    <view class="weekday-row">
+      <text class="weekday-cell">日</text>
+      <text class="weekday-cell">一</text>
+      <text class="weekday-cell">二</text>
+      <text class="weekday-cell">三</text>
+      <text class="weekday-cell">四</text>
+      <text class="weekday-cell">五</text>
+      <text class="weekday-cell">六</text>
+    </view>
+
+    <view class="calendar-grid">
+      <block wx:for="{{calendarGrid}}" wx:key="index" wx:for-item="row">
+        <view class="cal-row">
+          <view
+            class="cal-cell {{item.empty ? 'empty' : ''}} {{item.state === 'partial' ? 'partial' : ''}} {{item.state === 'all' ? 'all' : ''}} {{item.isToday ? 'today' : ''}} {{item.isFuture ? 'future' : ''}} {{selectedDate === item.date ? 'selected' : ''}}"
+            wx:for="{{row}}" wx:for-item="item" wx:key="day"
+            data-date="{{item.date}}" data-empty="{{item.empty}}" data-is-future="{{item.isFuture}}"
+            bindtap="tapDate">
+            <text wx:if="{{!item.empty}}" class="cal-day">{{item.day}}</text>
+          </view>
         </view>
+      </block>
+    </view>
+
+    <view wx:if="{{selectedDate}}" class="cal-detail">
+      <view class="cal-detail-header">
+        <text class="cal-detail-date">{{selectedDate}}</text>
+        <text class="cal-detail-count" wx:if="{{selectedCheckins.length > 0}}">{{selectedCheckins.length}}条记录</text>
       </view>
-      <view class="checkin-list">
-        <block wx:for="{{item.checkins}}" wx:key="_id">
+      <view wx:if="{{selectedCheckins.length === 0}}" class="cal-detail-empty">当天无打卡记录</view>
+      <view class="checkin-list" wx:else>
+        <block wx:for="{{selectedCheckins}}" wx:key="_id">
           <view class="checkin-item">
             <text class="item-emoji">{{item.taskEmoji}}</text>
             <view class="item-body">
               <text class="item-name">{{item.taskName}}</text>
               <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
-              <image
-                wx:if="{{item.image}}"
-                src="{{item.image}}"
-                mode="aspectFill"
-                class="item-image"
-                data-url="{{item.image}}"
-                bindtap="previewImage">
-              </image>
-            </view>
-            <!-- Fish bone decoration -->
-            <view class="item-tail">
-              <view class="tail-dot"></view>
-              <view class="tail-dot"></view>
-              <view class="tail-dot"></view>
+              <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFill" class="item-image" data-url="{{item.image}}" bindtap="previewImage"></image>
             </view>
           </view>
         </block>
       </view>
     </view>
-  </block>
-
-  <view wx:if="{{groups.length === 0}}" class="empty">
-    <text class="empty-emoji">🐾</text>
-    <text class="empty-text">还没有打卡记录</text>
-    <text class="empty-hint">去打卡页开始你的第一个任务吧~</text>
   </view>
+
+  <!-- ========== Day View (existing) ========== -->
+  <block wx:if="{{viewMode === 'day'}}">
+    <block wx:for="{{groups}}" wx:key="date">
+      <view class="date-group">
+        <view class="date-header">
+          <view class="date-dot"></view>
+          <text class="date-text">{{item.date}}</text>
+          <text class="date-weekday">{{item.weekday}}</text>
+          <view class="date-paw">
+            <view class="dp-toe"></view><view class="dp-toe"></view><view class="dp-toe"></view>
+            <view class="dp-pad"></view>
+          </view>
+        </view>
+        <view class="checkin-list">
+          <block wx:for="{{item.checkins}}" wx:key="_id">
+            <view class="checkin-item">
+              <text class="item-emoji">{{item.taskEmoji}}</text>
+              <view class="item-body">
+                <text class="item-name">{{item.taskName}}</text>
+                <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
+                <image
+                  wx:if="{{item.image}}"
+                  src="{{item.image}}"
+                  mode="aspectFill"
+                  class="item-image"
+                  data-url="{{item.image}}"
+                  bindtap="previewImage">
+                </image>
+              </view>
+              <!-- Fish bone decoration -->
+              <view class="item-tail">
+                <view class="tail-dot"></view>
+                <view class="tail-dot"></view>
+                <view class="tail-dot"></view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+
+    <view wx:if="{{groups.length === 0}}" class="empty">
+      <text class="empty-emoji">🐾</text>
+      <text class="empty-text">还没有打卡记录</text>
+      <text class="empty-hint">去打卡页开始你的第一个任务吧~</text>
+    </view>
+  </block>
 </view>
