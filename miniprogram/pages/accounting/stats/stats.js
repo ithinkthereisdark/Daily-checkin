@@ -216,6 +216,7 @@ Page({
       const height = res[0].height;
       canvas.width = width * dpr;
       canvas.height = height * dpr;
+      ctx.save();
       ctx.scale(dpr, dpr);
 
       const pad = { top: 20, right: 16, bottom: 40, left: 44 };
@@ -296,6 +297,8 @@ Page({
       ctx.fillRect(lx + 48, 4, 12, 12);
       ctx.fillStyle = '#5D4037';
       ctx.fillText('支出', lx + 64, 14);
+
+      ctx.restore();
     });
   },
 
