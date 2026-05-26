@@ -78,8 +78,12 @@ Page({
       date: this.todayStr(),
       preferredLedgerId: options.ledgerId || ''
     });
-    this.loadLedgers();
-    this.loadCustomCategories();
+    const isEdit = this.data.isEdit && this.data.editId;
+    Promise.all([this.loadLedgers(), this.loadCustomCategories()]).then(() => {
+      if (isEdit) {
+        this.loadTransaction();
+      }
+    });
   },
 
   todayStr() {
@@ -89,7 +93,7 @@ Page({
 
   loadLedgers() {
     const nickName = app.globalData.nickName;
-    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').get()
+    return db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').get()
       .then(res => {
         const ledgers = res.data;
         let currentLedger = ledgers[0];
@@ -104,10 +108,6 @@ Page({
         }
 
         this.setData({ ledgers, currentLedger });
-
-        if (this.data.isEdit && this.data.editId) {
-          this.loadTransaction();
-        }
       })
       .catch(err => {
         if (err.errCode !== -502005) {
@@ -125,7 +125,6 @@ Page({
         this.setData({
           currentLedger,
           type: tx.type,
-          categories: tx.type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES,
           selectedCategory: tx.category,
           selectedCategoryEmoji: tx.categoryEmoji,
           description: tx.description || '',
@@ -332,7 +331,7 @@ Page({
 
   loadCustomCategories() {
     const nickName = app.globalData.nickName;
-    db.collection('categories').where({ nickName }).get()
+    return db.collection('categories').where({ nickName }).get()
       .then(res => {
         this.setData({ customCategories: res.data });
         this.mergeCategories();
