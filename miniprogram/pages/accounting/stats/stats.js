@@ -303,6 +303,62 @@ Page({
   },
 
   drawPieChart() {
-    // Will be implemented in Task 4
+    const { pieData } = this.data;
+    if (!pieData.length) return;
+
+    const query = wx.createSelectorQuery();
+    query.select('#pieCanvas').fields({ node: true, size: true }).exec(res => {
+      if (!res[0] || !res[0].node) return;
+      const canvas = res[0].node;
+      const ctx = canvas.getContext('2d');
+      const dpr = wx.getSystemInfoSync().pixelRatio;
+      const size = res[0].width;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const outerR = size / 2 - 10;
+      const innerR = outerR * 0.55;
+
+      ctx.clearRect(0, 0, size, size);
+
+      let startAngle = -Math.PI / 2;
+      pieData.forEach(d => {
+        const sliceAngle = (d.percent / 100) * Math.PI * 2;
+
+        // Draw slice
+        ctx.beginPath();
+        ctx.moveTo(cx + innerR * Math.cos(startAngle), cy + innerR * Math.sin(startAngle));
+        ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
+        ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = d.color;
+        ctx.fill();
+
+        // Percentage label on slice (only if slice > 5%)
+        if (d.percent > 5) {
+          const midAngle = startAngle + sliceAngle / 2;
+          const labelR = (outerR + innerR) / 2;
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(d.percent + '%', cx + labelR * Math.cos(midAngle), cy + labelR * Math.sin(midAngle));
+        }
+
+        startAngle += sliceAngle;
+      });
+
+      // Center circle fill (donut hole)
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR - 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFBF7';
+      ctx.fill();
+
+      ctx.restore();
+    });
   }
 });
