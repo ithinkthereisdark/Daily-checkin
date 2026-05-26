@@ -176,12 +176,17 @@
     </block>
   </view>
 
-  <!-- Celebration Canvas Overlay -->
-  <canvas
-    wx:if="{{showCelebration}}"
-    type="2d"
-    id="celebrationCanvas"
-    class="celebration-canvas"
-  ></canvas>
+  <!-- Celebration Overlay -->
+  <view wx:if="{{showCelebration}}" class="celebration-overlay">
+    <canvas
+      type="2d"
+      id="celebrationCanvas"
+      class="celebration-canvas"
+    ></canvas>
+    <view class="celebration-text">
+      <text class="celebration-title">🎉 恭喜！</text>
+      <text class="celebration-sub">今天任务都完成了！</text>
+    </view>
+  </view>
 
 </view>

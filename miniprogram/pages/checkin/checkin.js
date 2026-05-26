@@ -34,7 +34,12 @@ Page({
   },
 
   onShow() {
-    this.loadData();
+    this.loadData(() => {
+      if (this._pendingCheck) {
+        this._pendingCheck = false;
+        this.checkAllDoneAndCelebrate();
+      }
+    });
   },
 
   loadData(onComplete) {
@@ -75,7 +80,6 @@ Page({
 
       this.setData({ tasks: merged, activeTasks, loading: false });
       if (onComplete) onComplete();
-      this.checkAllDoneAndCelebrate();
     }).catch(err => {
       console.error('加载数据失败', err);
       this.setData({ loading: false });
@@ -103,6 +107,7 @@ Page({
         wx.showToast({ title: '已达成目标次数', icon: 'none' });
         return;
       }
+      this._pendingCheck = true;
       wx.navigateTo({ url: `/pages/detail/detail?taskId=${task._id}` });
       return;
     }
@@ -120,6 +125,7 @@ Page({
         this.setData({ loading: false });
         return;
       }
+      this._pendingCheck = true;
       db.collection('checkins').add({
         data: {
           taskId: task._id,

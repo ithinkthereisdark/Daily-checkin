@@ -22,15 +22,13 @@
     </view>
   </view>
 
-  <!-- Time Range Tabs -->
+  <!-- Type Toggle -->
   <view class="range-tabs">
-    <view class="range-tab {{range === 'month' ? 'active' : ''}}" data-range="month" bindtap="switchRange">当月</view>
-    <view class="range-tab {{range === 'quarter' ? 'active' : ''}}" data-range="quarter" bindtap="switchRange">季度</view>
-    <view class="range-tab {{range === 'half' ? 'active' : ''}}" data-range="half" bindtap="switchRange">半年</view>
-    <view class="range-tab {{range === 'year' ? 'active' : ''}}" data-range="year" bindtap="switchRange">全年</view>
+    <view class="range-tab {{trendType === 'expense' ? 'active expense' : ''}}" data-type="expense" bindtap="switchTrendType">支出</view>
+    <view class="range-tab {{trendType === 'income' ? 'active income' : ''}}" data-type="income" bindtap="switchTrendType">收入</view>
   </view>
 
-  <scroll-view scroll-y class="main-scroll">
+  <view class="main-scroll">
     <!-- Trend Bar Chart -->
     <view class="section">
       <text class="section-title">📊 收支趋势</text>
@@ -39,11 +37,7 @@
 
     <!-- Category Ranking -->
     <view class="section">
-      <text class="section-title">{{rankType === 'expense' ? '📉' : '📈'}} 分类排行</text>
-      <view class="rank-toggle">
-        <view class="rank-tab {{rankType === 'expense' ? 'active' : ''}}" data-type="expense" bindtap="switchRankType">支出</view>
-        <view class="rank-tab {{rankType === 'income' ? 'active' : ''}}" data-type="income" bindtap="switchRankType">收入</view>
-      </view>
+      <text class="section-title">{{trendType === 'expense' ? '📉' : '📈'}} 分类排行</text>
       <view class="rank-list">
         <view class="rank-item" wx:for="{{rankList}}" wx:key="category">
           <text class="rank-emoji">{{item.emoji}}</text>
@@ -73,5 +67,5 @@
     </view>
 
     <view class="scroll-bottom"></view>
-  </scroll-view>
+  </view>
 </view>

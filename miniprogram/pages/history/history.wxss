@@ -229,7 +229,7 @@
 
 .weekday-row {
   display: flex;
-  margin-bottom: 8rpx;
+  margin-bottom: 4rpx;
 }
 
 .weekday-cell {
@@ -237,28 +237,36 @@
   text-align: center;
   font-size: 22rpx;
   color: #BCAAA4;
-  padding: 8rpx 0;
+  padding: 4rpx 0;
 }
 
 .calendar-grid {
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
 }
 
 .cal-row {
   display: flex;
-  gap: 6rpx;
+  margin-bottom: 4rpx;
+}
+
+.cal-row:last-child {
+  margin-bottom: 0;
 }
 
 .cal-cell {
   flex: 1;
-  aspect-ratio: 1;
+  height: 90rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 14rpx;
   background: #F5F0EB;
+  margin-right: 4rpx;
+}
+
+.cal-cell:last-child {
+  margin-right: 0;
 }
 
 .cal-cell.empty {

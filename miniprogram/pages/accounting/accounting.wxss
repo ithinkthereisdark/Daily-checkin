@@ -250,12 +250,16 @@
 /* ======== FAB Group ======== */
 .fab-group {
   position: fixed;
-  bottom: 120rpx;
-  right: 40rpx;
+  bottom: 80rpx;
+  left: 0;
+  right: 0;
   display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40rpx;
   z-index: 20;
+  pointer-events: none;
 }
 
 .fab {
@@ -266,6 +270,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 8rpx 24rpx rgba(232,144,92,0.4);
+  pointer-events: auto;
 }
 
 .fab:active {

@@ -1,8 +1,7 @@
 .page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   background: #FFF5EC;
+  padding-bottom: 40rpx;
 }
 
 .top-bar {
@@ -74,14 +73,19 @@
 }
 
 .range-tab.active {
-  background: #E8905C;
   color: #fff;
   font-weight: 600;
 }
 
+.range-tab.active.expense {
+  background: #C62828;
+}
+
+.range-tab.active.income {
+  background: #2E7D32;
+}
+
 .main-scroll {
-  flex: 1;
-  height: 0;
   padding: 16rpx 20rpx;
 }
 
@@ -119,25 +123,6 @@
 }
 
 /* Rank */
-.rank-toggle {
-  display: flex;
-  gap: 8rpx;
-  margin-bottom: 16rpx;
-}
-
-.rank-tab {
-  padding: 6rpx 20rpx;
-  border-radius: 16rpx;
-  font-size: 22rpx;
-  color: #8D7B72;
-  background: #F5F0EB;
-}
-
-.rank-tab.active {
-  background: #E8905C;
-  color: #fff;
-}
-
 .rank-list {
   display: flex;
   flex-direction: column;

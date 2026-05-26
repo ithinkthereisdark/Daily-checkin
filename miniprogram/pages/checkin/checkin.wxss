@@ -494,8 +494,8 @@
   margin-top: 6rpx;
 }
 
-/* Celebration Canvas */
-.celebration-canvas {
+/* Celebration Overlay */
+.celebration-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -503,4 +503,42 @@
   height: 100vh;
   z-index: 999;
   pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.celebration-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.celebration-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  margin-top: 25vh;
+  animation: celebFadeIn 0.5s ease-out;
+}
+
+.celebration-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #E8905C;
+  text-shadow: 0 2rpx 8rpx rgba(232,144,92,0.3);
+  margin-bottom: 8rpx;
+}
+
+.celebration-sub {
+  font-size: 32rpx;
+  color: #8D7B72;
+}
+
+@keyframes celebFadeIn {
+  from { opacity: 0; transform: translateY(30rpx); }
+  to { opacity: 1; transform: translateY(0); }
 }

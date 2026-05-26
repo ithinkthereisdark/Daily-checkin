@@ -5,16 +5,13 @@ const _ = db.command;
 Page({
   data: {
     currentLedger: null,
-    range: 'month',
-    dateStart: '',
-    dateEnd: '',
+    trendType: 'expense',
     totalIncome: 0,
     totalExpense: 0,
     totalBalance: 0,
-    rankType: 'expense',
     rankList: [],
     pieData: [],
-    trendMonths: [],
+    trendDays: [],
     trendData: []
   },
 
@@ -38,9 +35,7 @@ Page({
       })
       .catch(err => {
         if (err.errCode === -502005) {
-          this.setData({
-            totalIncome: 0, totalExpense: 0, totalBalance: 0
-          });
+          this.setData({ totalIncome: 0, totalExpense: 0, totalBalance: 0 });
           wx.showToast({ title: '请先创建账本', icon: 'none' });
           return;
         }
@@ -49,35 +44,29 @@ Page({
       });
   },
 
-  switchRange(e) {
-    this.setData({ range: e.currentTarget.dataset.range });
-    this.loadData();
-  },
-
-  switchRankType(e) {
+  switchTrendType(e) {
     const type = e.currentTarget.dataset.type;
-    this.setData({ rankType: type });
+    this.setData({ trendType: type });
     if (this._rawTransactions) {
       this.buildRankListFrom(this._rawTransactions);
       this.buildPieDataFrom(this._rawTransactions);
-      setTimeout(() => this.drawPieChart(), 200);
+      setTimeout(() => {
+        this.drawTrendChart();
+        this.drawPieChart();
+      }, 200);
     }
   },
 
   loadData() {
-    const { currentLedger, range } = this.data;
+    const { currentLedger } = this.data;
     if (!currentLedger) return;
 
     const now = new Date();
-    let monthsBack = 0;
-    if (range === 'month') monthsBack = 0;
-    else if (range === 'quarter') monthsBack = 2;
-    else if (range === 'half') monthsBack = 5;
-    else if (range === 'year') monthsBack = 11;
-
-    const dateEnd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const startDate = new Date(now.getFullYear(), now.getMonth() - monthsBack, 1);
-    const dateStart = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-01`;
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const lastDay = new Date(year, month, 0).getDate();
+    const dateStart = `${year}-${String(month).padStart(2, '0')}-01`;
+    const dateEnd = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     this.setData({ dateStart, dateEnd });
 
@@ -107,7 +96,7 @@ Page({
           this._rawTransactions = [];
           this.setData({
             totalIncome: 0, totalExpense: 0, totalBalance: 0,
-            trendMonths: [], trendData: [], rankList: [], pieData: []
+            trendDays: [], trendData: [], rankList: [], pieData: []
           });
           return;
         }
@@ -130,40 +119,41 @@ Page({
   },
 
   buildTrendData(transactions) {
-    const startDate = new Date(this.data.dateStart);
-    const endDate = new Date(this.data.dateEnd);
-    const months = [];
-    const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    while (cursor <= endDate) {
-      const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
-      months.push({ key, label: `${cursor.getMonth() + 1}月` });
-      cursor.setMonth(cursor.getMonth() + 1);
+    const { dateStart } = this.data;
+    const startDate = new Date(dateStart);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth() + 1;
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    const days = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      days.push({ key: dateStr, label: String(d) });
     }
 
-    const monthMap = {};
-    months.forEach(m => { monthMap[m.key] = { income: 0, expense: 0 }; });
+    const dayMap = {};
+    days.forEach(d => { dayMap[d.key] = { income: 0, expense: 0 }; });
     transactions.forEach(tx => {
-      const mk = tx.date.substring(0, 7);
-      if (monthMap[mk]) {
-        if (tx.type === 'income') monthMap[mk].income += tx.amount;
-        else monthMap[mk].expense += tx.amount;
+      if (dayMap[tx.date]) {
+        if (tx.type === 'income') dayMap[tx.date].income += tx.amount;
+        else dayMap[tx.date].expense += tx.amount;
       }
     });
 
-    const trendData = months.map(m => ({
-      month: m.label,
-      income: Math.round(monthMap[m.key].income * 100) / 100,
-      expense: Math.round(monthMap[m.key].expense * 100) / 100
+    const trendData = days.map(d => ({
+      day: d.label,
+      income: Math.round(dayMap[d.key].income * 100) / 100,
+      expense: Math.round(dayMap[d.key].expense * 100) / 100
     }));
 
-    this.setData({ trendMonths: months, trendData });
+    this.setData({ trendDays: days, trendData });
   },
 
   buildRankListFrom(transactions) {
-    const rankType = this.data.rankType;
+    const trendType = this.data.trendType;
     const catMap = {};
     transactions.forEach(tx => {
-      if (tx.type !== rankType) return;
+      if (tx.type !== trendType) return;
       const key = tx.category;
       if (!catMap[key]) catMap[key] = { category: key, emoji: tx.categoryEmoji, amount: 0 };
       catMap[key].amount += tx.amount;
@@ -180,18 +170,17 @@ Page({
   },
 
   buildPieDataFrom(transactions) {
-    const rankType = this.data.rankType;
+    const trendType = this.data.trendType;
     const colors = ['#E8905C','#FFB74D','#FFCC80','#FFE0B2','#FFF3E0','#BCAAA4','#A1887F','#8D6E63','#FFAB91','#F8BBD0'];
     const catMap = {};
     transactions.forEach(tx => {
-      if (tx.type !== rankType) return;
+      if (tx.type !== trendType) return;
       const key = tx.category;
       if (!catMap[key]) catMap[key] = { category: key, emoji: tx.categoryEmoji, amount: 0 };
       catMap[key].amount += tx.amount;
     });
     const total = Object.values(catMap).reduce((s, c) => s + c.amount, 0);
 
-    // All-zero data: show empty pie
     if (total === 0) {
       this.setData({ pieData: [] });
       return;
@@ -207,7 +196,6 @@ Page({
       color: colors[i % colors.length]
     }));
 
-    // Fix rounding gap: adjust last slice so total = 100%
     const pctSum = pieData.reduce((s, p) => s + p.percent, 0);
     if (pieData.length > 0 && pctSum !== 100) {
       pieData[pieData.length - 1].percent += Math.round((100 - pctSum) * 100) / 100;
@@ -217,7 +205,7 @@ Page({
   },
 
   drawTrendChart() {
-    const { trendData } = this.data;
+    const { trendData, trendType } = this.data;
     if (!trendData.length) return;
 
     const query = wx.createSelectorQuery();
@@ -233,20 +221,19 @@ Page({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      const pad = { top: 20, right: 16, bottom: 40, left: 44 };
+      const pad = { top: 20, right: 16, bottom: 36, left: 44 };
       const chartW = width - pad.left - pad.right;
       const chartH = height - pad.top - pad.bottom;
 
-      // Find max value for Y axis
+      // Find max value
       let maxVal = 0;
       trendData.forEach(d => {
-        if (d.income > maxVal) maxVal = d.income;
-        if (d.expense > maxVal) maxVal = d.expense;
+        const val = trendType === 'income' ? d.income : d.expense;
+        if (val > maxVal) maxVal = val;
       });
       if (maxVal === 0) maxVal = 100;
       maxVal = maxVal * 1.15;
 
-      // Clear canvas
       ctx.clearRect(0, 0, width, height);
 
       // Draw Y axis gridlines
@@ -264,28 +251,26 @@ Page({
       ctx.setLineDash([]);
 
       // Draw bars
-      const barGap = 4;
-      const groupWidth = chartW / trendData.length;
-      const barW = (groupWidth - barGap * 3) / 2;
+      const barColor = trendType === 'income' ? '#2E7D32' : '#C62828';
+      const barGap = Math.max(2, Math.min(6, chartW / trendData.length * 0.3));
+      const barW = (chartW - barGap * (trendData.length + 1)) / trendData.length;
 
       trendData.forEach((d, i) => {
-        const gx = pad.left + groupWidth * i;
+        const val = trendType === 'income' ? d.income : d.expense;
+        const barH = (val / maxVal) * chartH;
+        const bx = pad.left + barGap + (barW + barGap) * i;
 
-        // Expense bar (red, left side of group)
-        const expH = (d.expense / maxVal) * chartH;
-        ctx.fillStyle = '#C62828';
-        ctx.fillRect(gx + barGap, pad.top + chartH - expH, barW, expH);
+        ctx.fillStyle = barColor;
+        ctx.fillRect(bx, pad.top + chartH - barH, barW, Math.max(barH, 1));
 
-        // Income bar (green, right side of group)
-        const incH = (d.income / maxVal) * chartH;
-        ctx.fillStyle = '#2E7D32';
-        ctx.fillRect(gx + barGap * 2 + barW, pad.top + chartH - incH, barW, incH);
-
-        // Month label below bar
-        ctx.fillStyle = '#8D7B72';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(d.month, gx + groupWidth / 2, height - 6);
+        // Day label (show every few days to avoid crowding)
+        const showLabel = trendData.length <= 15 || i % 3 === 0 || i === trendData.length - 1;
+        if (showLabel) {
+          ctx.fillStyle = '#8D7B72';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(d.day, bx + barW / 2, height - 6);
+        }
       });
 
       // Y axis labels
@@ -297,20 +282,6 @@ Page({
         const y = pad.top + (chartH / gridLines) * i;
         ctx.fillText(String(val), pad.left - 6, y + 3);
       }
-
-      // Legend (top right)
-      const lx = width - pad.right - 80;
-      ctx.fillStyle = '#2E7D32';
-      ctx.fillRect(lx, 4, 12, 12);
-      ctx.fillStyle = '#5D4037';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('收入', lx + 16, 14);
-
-      ctx.fillStyle = '#C62828';
-      ctx.fillRect(lx + 48, 4, 12, 12);
-      ctx.fillStyle = '#5D4037';
-      ctx.fillText('支出', lx + 64, 14);
 
       ctx.restore();
     });
@@ -343,7 +314,6 @@ Page({
       pieData.forEach(d => {
         const sliceAngle = (d.percent / 100) * Math.PI * 2;
 
-        // Draw slice
         ctx.beginPath();
         ctx.moveTo(cx + innerR * Math.cos(startAngle), cy + innerR * Math.sin(startAngle));
         ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
@@ -352,7 +322,6 @@ Page({
         ctx.fillStyle = d.color;
         ctx.fill();
 
-        // Percentage label on slice (only if slice > 5%)
         if (d.percent > 5) {
           const midAngle = startAngle + sliceAngle / 2;
           const labelR = (outerR + innerR) / 2;
@@ -366,7 +335,6 @@ Page({
         startAngle += sliceAngle;
       });
 
-      // Center circle fill (donut hole)
       ctx.beginPath();
       ctx.arc(cx, cy, innerR - 2, 0, Math.PI * 2);
       ctx.fillStyle = '#FFFBF7';
