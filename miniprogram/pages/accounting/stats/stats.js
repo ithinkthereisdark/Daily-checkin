@@ -112,6 +112,7 @@ Page({
           return;
         }
         console.error('Load stats failed:', err);
+        wx.showToast({ title: '加载统计失败', icon: 'none' });
       });
   },
 
