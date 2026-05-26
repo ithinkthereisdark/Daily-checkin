@@ -190,15 +190,29 @@ Page({
       catMap[key].amount += tx.amount;
     });
     const total = Object.values(catMap).reduce((s, c) => s + c.amount, 0);
+
+    // All-zero data: show empty pie
+    if (total === 0) {
+      this.setData({ pieData: [] });
+      return;
+    }
+
     const items = Object.values(catMap)
       .map(c => ({ ...c, amount: Math.round(c.amount * 100) / 100 }))
       .sort((a, b) => b.amount - a.amount);
 
     const pieData = items.map((item, i) => ({
       ...item,
-      percent: total > 0 ? Math.round(item.amount / total * 10000) / 100 : 0,
+      percent: Math.round(item.amount / total * 10000) / 100,
       color: colors[i % colors.length]
     }));
+
+    // Fix rounding gap: adjust last slice so total = 100%
+    const pctSum = pieData.reduce((s, p) => s + p.percent, 0);
+    if (pieData.length > 0 && pctSum !== 100) {
+      pieData[pieData.length - 1].percent += Math.round((100 - pctSum) * 100) / 100;
+    }
+
     this.setData({ pieData });
   },
 
