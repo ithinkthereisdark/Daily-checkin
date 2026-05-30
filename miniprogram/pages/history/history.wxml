@@ -24,17 +24,15 @@
     </view>
 
     <view class="calendar-grid">
-      <block wx:for="{{calendarGrid}}" wx:key="index" wx:for-item="row">
-        <view class="cal-row">
-          <view
-            class="cal-cell {{item.empty ? 'empty' : ''}} {{item.state === 'partial' ? 'partial' : ''}} {{item.state === 'all' ? 'all' : ''}} {{item.isToday ? 'today' : ''}} {{item.isFuture ? 'future' : ''}} {{selectedDate === item.date ? 'selected' : ''}}"
-            wx:for="{{row}}" wx:for-item="item" wx:key="day"
-            data-date="{{item.date}}" data-empty="{{item.empty}}" data-is-future="{{item.isFuture}}"
-            bindtap="tapDate">
-            <text wx:if="{{!item.empty}}" class="cal-day">{{item.day}}</text>
-          </view>
+      <view class="cal-row" wx:for="{{calendarGrid}}" wx:key="index" wx:for-item="row">
+        <view
+          class="cal-cell {{item.empty ? 'empty' : ''}} {{item.state === 'partial' ? 'partial' : ''}} {{item.state === 'all' ? 'all' : ''}} {{item.isToday ? 'today' : ''}} {{item.isFuture ? 'future' : ''}} {{selectedDate === item.date ? 'selected' : ''}}"
+          wx:for="{{row}}" wx:for-item="item" wx:key="kid"
+          data-date="{{item.date}}" data-empty="{{item.empty}}" data-is-future="{{item.isFuture}}"
+          bindtap="tapDate">
+          <text wx:if="{{!item.empty}}" class="cal-day">{{item.day}}</text>
         </view>
-      </block>
+      </view>
     </view>
 
     <view wx:if="{{selectedDate}}" class="cal-detail">

@@ -94,9 +94,10 @@ Page({
 
     const grid = [];
     let row = [];
+    let kid = 0;
 
     for (let i = 0; i < startWeekDay; i++) {
-      row.push({ day: '', empty: true });
+      row.push({ day: '', empty: true, kid: kid++ });
     }
 
     const todayStr = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
@@ -110,7 +111,7 @@ Page({
       if (checkedCount > 0 && checkedCount >= totalActive && totalActive > 0) state = 'all';
       else if (checkedCount > 0) state = 'partial';
 
-      row.push({ day: d, date: dateStr, state, isToday: dateStr === todayStr, isFuture: dateStr > todayStr });
+      row.push({ day: d, date: dateStr, state, isToday: dateStr === todayStr, isFuture: dateStr > todayStr, kid: kid++ });
 
       if (row.length === 7) {
         grid.push(row);
@@ -119,7 +120,7 @@ Page({
     }
 
     if (row.length > 0) {
-      while (row.length < 7) row.push({ day: '', empty: true });
+      while (row.length < 7) row.push({ day: '', empty: true, kid: kid++ });
       grid.push(row);
     }
 

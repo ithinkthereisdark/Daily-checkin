@@ -247,6 +247,7 @@
 
 .cal-row {
   display: flex;
+  flex-wrap: nowrap;
   margin-bottom: 4rpx;
 }
 
@@ -256,21 +257,20 @@
 
 .cal-cell {
   flex: 1;
+  min-width: 0;
   height: 90rpx;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 14rpx;
   background: #F5F0EB;
-  margin-right: 4rpx;
-}
-
-.cal-cell:last-child {
-  margin-right: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .cal-cell.empty {
-  background: transparent;
+  background: #FFFBF7;
 }
 
 .cal-cell.partial {

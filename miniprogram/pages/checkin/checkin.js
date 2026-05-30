@@ -137,7 +137,14 @@ Page({
         }
       }).then(() => { wx.showToast({ title: '已打卡', icon: 'success' }); })
         .catch(() => { wx.showToast({ title: '打卡失败', icon: 'none' }); })
-        .finally(() => { this.loadData(); });
+        .finally(() => {
+          this.loadData(() => {
+            if (this._pendingCheck) {
+              this._pendingCheck = false;
+              this.checkAllDoneAndCelebrate();
+            }
+          });
+        });
     }
   },
 
