@@ -1,53 +1,203 @@
-# 花椒点点微信小程序
+# 花椒点点
 
-## Project overview
+一款基于**微信云开发**的任务打卡与生活记账小程序，适用于个人或小团队（双人）的日常习惯追踪与消费记录。
 
-A WeChat Mini Program (微信小程序) for task-driven daily check-in ("每日打卡"), built on WeChat Cloud Development (微信云开发). Users create tasks with emoji icons, date ranges, and target counts; the home grid shows all tasks with one-tap check-in toggle. Two-person private app — all data is filtered by nickname.
+---
 
-## Tech stack
+## 功能概览
 
-- **WeChat Mini Program** (native framework, no third-party UI library)
-- **WeChat Cloud Base** (云开发): Cloud Database + Cloud Storage, no cloud functions
-- Base library version: 3.16.0 (see `project.private.config.json`)
+### 📋 每日打卡
+- **任务卡片网格**：首页展示所有打卡任务，每个任务可自定义 emoji 图标、目标次数、起止日期
+- **一键打卡**：点击卡片即可完成当天打卡（支持一键取消）
+- **详细打卡**：可配置任务是否需要填写详细内容（文字描述 + 图片上传）
+- **过期/未开始任务**：自动灰显并置于列表末尾，不可操作
+- **完成庆祝动画**：当日全部任务完成后，触发萌爪印庆祝特效 🐾
 
-## Architecture
+### 💰 记账
+- **分类记账**：支持预设分类 + 自定义分类，记录每笔收支
+- **数据统计**：Canvas 2D 绘制的环形图（分类占比）和趋势柱状图（月度趋势）
+- **长按删除**：自定义分类支持长按删除
+
+### 📅 记录
+- **时间线视图**：按日期分组展示所有打卡记录
+- **月日历视图**：日历模式展示当月打卡情况，一目了然
+- **打卡详情**：查看每条打卡的文字和图片内容
+
+### 🛠 小工具
+- **音频裁剪**：云函数驱动的音频文件裁剪工具
+
+---
+
+## 技术栈
+
+| 类别 | 技术 |
+|------|------|
+| 前端框架 | 微信小程序原生框架（无第三方 UI 库） |
+| 后端服务 | 微信云开发（Cloud Base） |
+| 数据库 | 云数据库（文档型数据库） |
+| 存储 | 云存储（图片、音频等文件） |
+| 云函数 | Node.js（音频裁剪等） |
+| 基础库版本 | 3.16.0 |
+| 图表绘制 | Canvas 2D API（环形图、柱状图） |
+
+---
+
+## 项目结构
 
 ```
-miniprogram/
-  app.js              ← Cloud init, nickname management
-  app.json            ← 4 pages, 3-tab tabBar (打卡/管理/记录)
-  app.wxss            ← Global styles
-  pages/
-    checkin/          ← Tab 1: task card grid, one-tap check-in toggle
-    tasks/            ← Tab 2: task CRUD (name, emoji picker, date range, target, detail toggle)
-    history/          ← Tab 3: check-in timeline grouped by date (read-only)
-    detail/           ← Non-tab: detailed check-in form (navigated from checkin for needDetail tasks)
+├── miniprogram/                   # 小程序源码根目录
+│   ├── app.js                     # 应用入口：云开发初始化、用户昵称管理
+│   ├── app.json                   # 全局配置：页面路由、4 选项卡 TabBar
+│   ├── app.wxss                   # 全局样式
+│   ├── pages/
+│   │   ├── checkin/               # Tab 1「打卡」：任务卡片网格，一键打卡
+│   │   ├── accounting/            # Tab 2「记账」：收支记录列表
+│   │   │   ├── add/               #   添加记账条目页面
+│   │   │   └── stats/            #   记账统计页面（环形图 + 柱状图）
+│   │   ├── history/               # Tab 3「记录」：打卡时间线 + 月日历
+│   │   ├── detail/                # 打卡详情页：详细打卡表单（文字 + 图片）
+│   │   └── tools/                 # Tab 4「小工具」：工具集合页
+│   │       └── audio-trim/       #   音频裁剪工具页面
+│   ├── images/                    # 图标资源（TabBar 图标等）
+│   └── sitemap.json              # 站点地图配置
+├── cloudfunctions/                # 云函数目录
+│   └── audioTrim/                 # 音频裁剪云函数
+├── project.config.json            # 项目配置文件
+├── project.private.config.json    # 私有配置文件（覆盖 project.config.json）
+└── CLAUDE.md                      # AI 辅助开发说明文档
 ```
 
-## Data model
+---
 
-| Collection | Fields |
-|-----------|--------|
-| `tasks` | name, emoji, startDate, endDate, targetCount, needDetail, nickName, createTime |
-| `checkins` | taskId, date (YYYY-MM-DD), nickName, description, image, createTime |
+## 数据模型
 
-Dates are stored as YYYY-MM-DD strings for simple comparison. All queries filter by `nickName` from `app.globalData.nickName`.
+### `tasks` 集合（打卡任务）
 
-## Key flows
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `_id` | string | 自动生成的文档 ID |
+| `name` | string | 任务名称 |
+| `emoji` | string | 任务图标（emoji 字符） |
+| `startDate` | string | 任务起始日期（YYYY-MM-DD） |
+| `endDate` | string | 任务截止日期（YYYY-MM-DD） |
+| `targetCount` | number | 目标打卡次数（达到后不允许新增打卡，但可取消当日打卡） |
+| `needDetail` | boolean | 是否需要填写详细打卡内容 |
+| `nickName` | string | 创建者昵称（用于数据隔离） |
+| `createTime` | Date | 创建时间 |
 
-- **Check-in toggle**: Tap a task card → if `needDetail=false`, creates a checkin for today (or deletes existing one to cancel). If `needDetail=true`, navigates to detail page. Expired/future tasks are guarded.
-- **Task lifecycle**: `startDate` (task begins) → active period → `endDate` (task expires, greyed out, bottom of grid). `targetCount` is the check-in ceiling — hitting it blocks new check-ins but allows cancelling today's.
-- **Client-side joining**: History page fetches all tasks + all checkins, builds a taskMap, groups checkins by date. Same pattern is used by checkin page for counting.
+### `checkins` 集合（打卡记录）
 
-## Cloud environment
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `_id` | string | 自动生成的文档 ID |
+| `taskId` | string | 关联的任务 ID |
+| `date` | string | 打卡日期（YYYY-MM-DD） |
+| `nickName` | string | 打卡者昵称（用于数据隔离） |
+| `description` | string | 打卡详细描述（needDetail 为 true 时填写） |
+| `image` | string | 打卡图片云存储路径（needDetail 为 true 时可选） |
+| `createTime` | Date | 创建时间 |
 
-- **Env ID**: `cloud1-d3geah2hy20028cb5` (hardcoded in `app.js`)
-- Collections are auto-created on first write — no manual setup needed
-- The old `records` collection from the previous version is kept but unused
+### `expenses` 集合（记账记录）
 
-## Development
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `_id` | string | 自动生成的文档 ID |
+| `amount` | number | 金额 |
+| `category` | string | 分类名称 |
+| `type` | string | 类型：`income`（收入）/ `expense`（支出） |
+| `date` | string | 记账日期（YYYY-MM-DD） |
+| `note` | string | 备注说明 |
+| `nickName` | string | 记账者昵称（用于数据隔离） |
+| `createTime` | Date | 创建时间 |
 
-- Open project root in **WeChat DevTools** (微信开发者工具)
-- No build commands or test infrastructure
-- Cloud functions directory (`cloudfunctions/`) is configured but empty
+> **注意**：所有日期字段均采用 `YYYY-MM-DD` 字符串格式，便于直接比较和分组。所有数据查询均按 `nickName` 进行过滤，实现多用户数据隔离。
 
+---
+
+## 核心流程
+
+### 打卡流程
+```
+点击任务卡片
+  ├─ 任务未开始/已过期 → 提示无法打卡
+  ├─ 已达到目标次数 + 今日未打卡 → 提示已达目标
+  ├─ needDetail = false
+  │   ├─ 今日未打卡 → 创建打卡记录 ✅
+  │   └─ 今日已打卡 → 删除打卡记录（取消打卡）❌
+  ├─ needDetail = true → 跳转打卡详情页
+  │   └─ 填写文字描述 + 上传图片 → 提交打卡 ✅
+  └─ 当日全部任务完成 → 触发庆祝动画 🎉
+```
+
+### 任务生命周期
+```
+创建任务（设置起止日期、目标次数）
+  → 未开始（startDate 之前，灰显不可操作）
+  → 活跃期（可正常打卡）
+  → 已过期（endDate 之后，灰显置底）
+  → 达到目标（targetCount 达标，仅可取消当日打卡）
+```
+
+### 数据关联
+- 记录页采用**客户端 Join** 模式：一次性拉取所有 tasks 和 checkins，在客户端构建 taskMap，按日期分组展示
+- 打卡页同样使用此模式统计各任务的已完成次数
+
+---
+
+## 云开发环境
+
+| 配置项 | 值 |
+|--------|-----|
+| 环境 ID | `cloud1-d3geah2hy20028cb5` |
+| AppID | `wx4ff15a7326949d6e` |
+| 数据库集合 | `tasks`、`checkins`、`expenses`（首次写入自动创建） |
+| 云存储 | 打卡图片、音频文件等 |
+
+---
+
+## 本地开发
+
+### 前置条件
+1. 下载并安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
+2. 注册微信小程序账号并获取 AppID
+3. 开通微信云开发服务
+
+### 启动步骤
+```bash
+# 1. 克隆项目
+git clone <repo-url>
+cd Daily-checkin
+
+# 2. 用微信开发者工具打开项目根目录
+
+# 3. 修改 app.js 中的云环境 ID 为你自己的环境
+#    wx.cloud.init({ env: '你的环境ID', ... })
+
+# 4. 在开发者工具中点击「编译」即可预览
+```
+
+### 项目配置
+- `.vscode/` — VS Code 编辑器配置
+- `project.config.json` — 项目级配置（与团队成员共享）
+- `project.private.config.json` — 个人私有配置（不提交到版本控制）
+
+---
+
+## 开发说明
+
+- 本项目没有构建工具，使用微信小程序原生开发方式
+- 云函数目录 `cloudfunctions/` 仅包含 `audioTrim` 一个云函数，其余功能均通过云数据库 SDK 直接调用
+- 无自动化测试基础设施，开发时通过微信开发者工具进行手动调试
+- 代码风格：每个页面由 `.js` / `.json` / `.wxml` / `.wxss` 四个文件组成，遵循微信小程序标准规范
+- 详见 `CLAUDE.md` 了解 AI 辅助开发的更多上下文
+
+---
+
+## 最近更新
+
+- 🐾 完成庆祝动画：当日全部任务打卡完成后触发爪印特效
+- 📅 月日历视图：记录页新增日历模式查看打卡情况
+- 📊 记账统计：Canvas 2D 环形图（分类占比）+ 柱状图（月度趋势）
+- 🏷️ 自定义分类：记账支持创建和删除自定义分类
+- 🛠 音频裁剪工具：基于云函数的音频裁剪功能
+- 🔧 多项问题修复与体验优化
