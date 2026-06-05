@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="emoji-grid">
+    <view
+      class="emoji-cell"
+      wx:for="{{emojis}}"
+      wx:key="*this"
+      data-emoji="{{item}}"
+      bindlongpress="deleteEmoji"
+    >
+      <text class="emoji-char">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="add-bar">
+    <button class="add-btn" bindtap="openAddForm">+ 添加新图标</button>
+  </view>
+
+  <!-- Add Form Overlay -->
+  <view class="sheet-overlay" wx:if="{{showAddForm}}" bindtap="closeAddForm">
+    <view class="sheet-content" catchtap>
+      <view class="sheet-handle"></view>
+      <view class="form-title">添加新图标</view>
+      <view class="form-hint">在输入框中输入任意 emoji 字符</view>
+      <input
+        class="emoji-input"
+        placeholder="点击这里输入图标..."
+        value="{{newEmoji}}"
+        bindinput="onEmojiInput"
+        maxlength="2"
+        focus="{{showAddForm}}"
+      />
+      <view class="form-actions">
+        <view class="form-btn cancel" bindtap="closeAddForm">取消</view>
+        <view class="form-btn confirm" bindtap="addEmoji">确定</view>
+      </view>
+    </view>
+  </view>
+</view>
