@@ -1,0 +1,65 @@
+<view class="page">
+  <!-- Type Tabs -->
+  <view class="type-tabs">
+    <view class="type-tab {{tab === 'expense' ? 'active' : ''}}" data-tab="expense" bindtap="switchTab">支出</view>
+    <view class="type-tab {{tab === 'income' ? 'active' : ''}}" data-tab="income" bindtap="switchTab">收入</view>
+  </view>
+
+  <!-- Category List -->
+  <view class="cat-list">
+    <view
+      class="cat-row"
+      wx:for="{{categories}}"
+      wx:key="_id"
+      data-item="{{item}}"
+      bindlongpress="deleteCategory"
+    >
+      <text class="cat-emoji">{{item.emoji}}</text>
+      <text class="cat-name">{{item.name}}</text>
+      <text wx:if="{{item.isPreset}}" class="cat-preset-tag">预设</text>
+      <text wx:else class="cat-delete-hint">长按删除</text>
+    </view>
+
+    <view wx:if="{{categories.length === 0}}" class="empty">
+      <text class="empty-emoji">📝</text>
+      <text class="empty-text">暂无分类</text>
+    </view>
+  </view>
+
+  <!-- Add Button -->
+  <view class="add-bar">
+    <button class="add-btn" bindtap="openAddForm">+ 新增分类</button>
+  </view>
+
+  <!-- Add Form Overlay -->
+  <view class="sheet-overlay" wx:if="{{showAddForm}}" bindtap="closeAddForm">
+    <view class="sheet-content" catchtap>
+      <view class="sheet-handle"></view>
+      <view class="form-title">新增分类</view>
+
+      <view class="form-label">选择图标</view>
+      <view class="emoji-grid">
+        <view
+          class="emoji-cell {{newCategoryEmoji === item ? 'selected' : ''}}"
+          wx:for="{{emojiLibrary}}"
+          wx:key="*this"
+          data-emoji="{{item}}"
+          bindtap="selectEmoji"
+        >{{item}}</view>
+      </view>
+
+      <input
+        class="form-input"
+        placeholder="分类名称"
+        value="{{newCategoryName}}"
+        bindinput="onCategoryNameInput"
+        maxlength="8"
+      />
+
+      <view class="form-actions">
+        <view class="form-btn cancel" bindtap="closeAddForm">取消</view>
+        <view class="form-btn confirm" bindtap="addCategory">确定</view>
+      </view>
+    </view>
+  </view>
+</view>
