@@ -113,7 +113,7 @@
     </view>
 
     <block wx:for="{{tasks}}" wx:key="_id">
-      <view class="task-row {{item.isExpired ? 'expired' : ''}}">
+      <view class="task-row {{item.isExpired ? 'expired' : ''}}" bindlongpress="onLongPressTask" data-task="{{item}}">
         <!-- Normal display -->
         <block wx:if="{{editingId !== item._id}}">
           <view class="task-row-inner">
@@ -193,6 +193,21 @@
       <text class="celebration-title">🎉 恭喜！</text>
       <text class="celebration-sub">今天任务都完成了！</text>
     </view>
+  </view>
+
+  <!-- Backfill bar -->
+  <view wx:if="{{backfillTask}}" class="backfill-bar">
+    <text class="backfill-label">补打：{{backfillTask.emoji}} {{backfillTask.name}}</text>
+    <picker
+      mode="date"
+      start="{{backfillTask.startDate}}"
+      end="{{backfillToday}}"
+      value="{{backfillToday}}"
+      bindchange="onBackfillDateChange"
+    >
+      <view class="backfill-picker">📅 选择日期</view>
+    </picker>
+    <view class="backfill-cancel" bindtap="cancelBackfill">取消</view>
   </view>
 
 </view>

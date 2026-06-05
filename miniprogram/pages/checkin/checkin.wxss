@@ -550,3 +550,44 @@
   font-size: 24rpx;
   color: #E8905C;
 }
+
+/* Backfill bar */
+.backfill-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFBF7;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  box-shadow: 0 -2rpx 16rpx rgba(180,140,120,0.12);
+  z-index: 100;
+}
+
+.backfill-label {
+  flex: 1;
+  font-size: 26rpx;
+  color: #5D4037;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.backfill-picker {
+  padding: 12rpx 24rpx;
+  background: #E8905C;
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.backfill-cancel {
+  padding: 12rpx 16rpx;
+  color: #BCAAA4;
+  font-size: 26rpx;
+}

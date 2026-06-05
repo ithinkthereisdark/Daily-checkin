@@ -24,6 +24,8 @@ Page({
     activeTasks: [],
     loading: false,
     showCelebration: false,
+    backfillTask: null,
+    backfillToday: '',
 
     // Management form state
     showNewForm: false,
@@ -34,6 +36,7 @@ Page({
   },
 
   onShow() {
+    this.setData({ backfillToday: todayStr() });
     this.loadEmojiLibrary();
     this.loadData(() => {
       if (this._pendingCheck) {
@@ -158,6 +161,81 @@ Page({
           });
         });
     }
+  },
+
+  onLongPressTask(e) {
+    if (this.data.loading) return;
+    const task = e.currentTarget.dataset.task;
+
+    if (task.isExpired) {
+      wx.showToast({ title: '任务已过期', icon: 'none' });
+      return;
+    }
+    if (task.isNotStarted) {
+      wx.showToast({ title: '任务还未开始', icon: 'none' });
+      return;
+    }
+    if (task.checkinCount >= task.targetCount) {
+      wx.showToast({ title: '已达成目标次数', icon: 'none' });
+      return;
+    }
+
+    this.setData({ backfillTask: task });
+  },
+
+  cancelBackfill() {
+    this.setData({ backfillTask: null });
+  },
+
+  onBackfillDateChange(e) {
+    const date = e.detail.value;
+    const task = this.data.backfillTask;
+    if (!task) return;
+
+    this.setData({ backfillTask: null });
+
+    const nickName = app.globalData.nickName;
+    db.collection('checkins')
+      .where({ taskId: task._id, nickName, date })
+      .limit(1)
+      .get()
+      .then(res => {
+        if (res.data.length > 0) {
+          wx.showToast({ title: '此日期已打卡', icon: 'none' });
+          return;
+        }
+
+        if (task.needDetail) {
+          wx.navigateTo({
+            url: `/pages/detail/detail?taskId=${task._id}&date=${date}`
+          });
+          return;
+        }
+
+        this.setData({ loading: true });
+        return db.collection('checkins').add({
+          data: {
+            taskId: task._id,
+            date,
+            nickName: app.globalData.nickName,
+            description: '',
+            images: [],
+            createTime: new Date()
+          }
+        });
+      })
+      .then(() => {
+        if (task.needDetail) return;
+        wx.showToast({ title: '已补打', icon: 'success' });
+        this.loadData(() => {
+          this.checkAllDoneAndCelebrate();
+        });
+      })
+      .catch(err => {
+        console.error('补打失败', err);
+        wx.showToast({ title: '补打失败', icon: 'none' });
+        this.setData({ loading: false });
+      });
   },
 
   // ========== Management area ==========
