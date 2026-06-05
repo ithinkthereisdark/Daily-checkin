@@ -70,12 +70,13 @@ Page({
           .where({ nickName, emoji })
           .get()
           .then(res => {
-            if (res.data.length === 0) return;
+            if (res.data.length === 0) return 0;
             return Promise.all(res.data.map(doc =>
               db.collection('emoji_library').doc(doc._id).remove()
-            ));
+            )).then(() => res.data.length);
           })
-          .then(() => {
+          .then(deletedCount => {
+            if (deletedCount === 0) return;
             wx.showToast({ title: '已删除', icon: 'success' });
             this.loadEmojis();
           })
