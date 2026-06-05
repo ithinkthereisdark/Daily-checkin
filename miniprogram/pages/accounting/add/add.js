@@ -55,6 +55,13 @@ Page({
     this.loadCategories();
   },
 
+  onShow() {
+    // 从分类管理页返回后刷新分类列表
+    if (this._allCategories) {
+      this.loadCategories();
+    }
+  },
+
   todayStr() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
