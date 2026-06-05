@@ -86,8 +86,22 @@
   position: relative;
 }
 
-.checkin-item:last-child {
+/* Checked-in card — green tint (month view only) */
+.cal-detail .checkin-item:not(.unchecked) {
+  background: linear-gradient(135deg, #F6FFF0 0%, #F0FFF4 100%);
+  margin: 12rpx 16rpx;
+  border-radius: 16rpx;
   border-bottom: none;
+  box-shadow: 0 2rpx 10rpx rgba(100, 180, 120, 0.10);
+}
+
+/* Unchecked card — red/pink tint (month view only) */
+.cal-detail .checkin-item.unchecked {
+  background: linear-gradient(135deg, #FFF5F5 0%, #FFF0F0 100%);
+  margin: 12rpx 16rpx;
+  border-radius: 16rpx;
+  border-bottom: none;
+  box-shadow: 0 2rpx 10rpx rgba(200, 120, 120, 0.10);
 }
 
 .item-emoji {
@@ -131,7 +145,6 @@
   flex-shrink: 0;
 }
 
-/* Decorative tail dots */
 .item-tail {
   display: flex;
   flex-direction: column;
@@ -148,8 +161,6 @@
   background: #E8905C;
   border-radius: 50%;
 }
-
-/* ====== Empty State ====== */
 
 .empty {
   text-align: center;
@@ -344,20 +355,23 @@
   padding: 30rpx 0;
 }
 
-.checkin-item.unchecked {
-  background: rgba(0, 0, 0, 0.02);
+.cal-detail .checkin-list {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .unchecked-emoji {
-  opacity: 0.4;
+  opacity: 0.55;
 }
 
 .unchecked-name {
-  color: #BCAAA4;
+  color: #C48B7B;
 }
 
 .unchecked-hint {
   font-size: 22rpx;
-  color: #D7CCC8;
+  color: #D4A099;
   margin-top: 4rpx;
 }
