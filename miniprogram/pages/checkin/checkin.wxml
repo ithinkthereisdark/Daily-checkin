@@ -19,7 +19,8 @@
           <view
             class="mini-card {{item.checkedInToday ? 'checked' : ''}} {{item.checkinCount >= item.targetCount && !item.checkedInToday ? 'done' : ''}}"
             data-task="{{item}}"
-            bindtap="onTapCheckin">
+            bindtap="onTapCheckin"
+            bindlongpress="onLongPressTask">
             <!-- Paw print decoration for checked state -->
             <view wx:if="{{item.checkedInToday}}" class="paw-print">
               <view class="paw-pad"></view>
