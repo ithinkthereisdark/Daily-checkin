@@ -1,5 +1,6 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { ensureCategories } = require('../../../utils/emoji');
 
 function evaluate(expr) {
   expr = expr.replace(/[+\-]$/, '');
@@ -15,34 +16,6 @@ function evaluate(expr) {
   return result;
 }
 
-const EXPENSE_CATEGORIES = [
-  { name: '餐饮', emoji: '🍽️' },
-  { name: '交通', emoji: '🚌' },
-  { name: '购物', emoji: '🛍️' },
-  { name: '住房', emoji: '🏠' },
-  { name: '娱乐', emoji: '🎮' },
-  { name: '医疗', emoji: '💊' },
-  { name: '教育', emoji: '📚' },
-  { name: '通讯', emoji: '📱' },
-  { name: '服饰', emoji: '👗' },
-  { name: '美容', emoji: '💄' },
-  { name: '运动', emoji: '🏃' },
-  { name: '宠物', emoji: '🐱' },
-  { name: '礼物', emoji: '🎁' },
-  { name: '办公', emoji: '💼' },
-  { name: '其他', emoji: '📌' }
-];
-
-const INCOME_CATEGORIES = [
-  { name: '工资', emoji: '💰' },
-  { name: '礼金', emoji: '🎁' },
-  { name: '理财', emoji: '📈' },
-  { name: '兼职', emoji: '💼' },
-  { name: '报销', emoji: '📋' },
-  { name: '退款', emoji: '↩️' },
-  { name: '其他', emoji: '📌' }
-];
-
 Page({
   data: {
     isEdit: false,
@@ -51,7 +24,7 @@ Page({
     currentLedger: null,
     showLedgerPicker: false,
     type: 'expense',
-    categories: EXPENSE_CATEGORIES,
+    categories: [],
     selectedCategory: '',
     selectedCategoryEmoji: '',
     description: '',
@@ -59,12 +32,7 @@ Page({
     expression: '',
     currentInput: '',
     result: '0',
-    saving: false,
-    customCategories: [],
-    showCategoryForm: false,
-    newCategoryName: '',
-    newCategoryEmoji: '📌',
-    categoryFormType: 'expense'
+    saving: false
   },
 
   onLoad(options) {
@@ -79,11 +47,12 @@ Page({
       preferredLedgerId: options.ledgerId || ''
     });
     const isEdit = this.data.isEdit && this.data.editId;
-    Promise.all([this.loadLedgers(), this.loadCustomCategories()]).then(() => {
+    this.loadLedgers().then(() => {
       if (isEdit) {
-        this.loadTransaction();
+        return this.loadTransaction();
       }
     });
+    this.loadCategories();
   },
 
   todayStr() {
@@ -133,7 +102,7 @@ Page({
           currentInput: '',
           result: String(tx.amount)
         });
-        this.mergeCategories();
+        this.filterCategories();
       })
       .catch(err => {
         console.error('Load transaction failed:', err);
@@ -159,7 +128,7 @@ Page({
       selectedCategory: '',
       selectedCategoryEmoji: ''
     });
-    this.mergeCategories();
+    this.filterCategories();
   },
 
   selectCategory(e) {
@@ -329,95 +298,27 @@ Page({
     });
   },
 
-  loadCustomCategories() {
+  loadCategories() {
     const nickName = app.globalData.nickName;
-    return db.collection('categories').where({ nickName }).limit(100).get()
-      .then(res => {
-        this.setData({ customCategories: res.data });
-        this.mergeCategories();
-      })
-      .catch(err => {
-        if (err.errCode !== -502005) console.error('Load categories failed:', err);
-        this.setData({ customCategories: [] });
-        this.mergeCategories();
-      });
+    ensureCategories(nickName).then(categories => {
+      this._allCategories = categories;
+      this.filterCategories();
+    });
   },
 
-  mergeCategories() {
+  filterCategories() {
     const type = this.data.type;
-    const base = type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
-    const custom = this.data.customCategories.filter(c => c.type === type);
-    const merged = [...base, ...custom];
-    this.setData({ categories: merged });
+    const categories = (this._allCategories || [])
+      .filter(c => c.type === type)
+      .sort((a, b) => {
+        if (a.isPreset && !b.isPreset) return -1;
+        if (!a.isPreset && b.isPreset) return 1;
+        return 0;
+      });
+    this.setData({ categories });
   },
 
-  openCategoryForm(e) {
-    const type = e.currentTarget.dataset.type || this.data.type;
-    this.setData({
-      showCategoryForm: true,
-      categoryFormType: type,
-      newCategoryName: '',
-      newCategoryEmoji: '📌'
-    });
-  },
-
-  closeCategoryForm() {
-    this.setData({ showCategoryForm: false });
-  },
-
-  onCategoryNameInput(e) {
-    this.setData({ newCategoryName: e.detail.value });
-  },
-
-  selectCategoryEmoji(e) {
-    this.setData({ newCategoryEmoji: e.currentTarget.dataset.emoji });
-  },
-
-  saveCategory() {
-    const { newCategoryName, newCategoryEmoji, categoryFormType } = this.data;
-    const name = newCategoryName.trim();
-    if (!name) {
-      wx.showToast({ title: '请输入分类名称', icon: 'none' });
-      return;
-    }
-
-    const nickName = app.globalData.nickName;
-    db.collection('categories').add({
-      data: {
-        name,
-        emoji: newCategoryEmoji,
-        type: categoryFormType,
-        nickName,
-        createTime: new Date()
-      }
-    }).then(() => {
-      wx.showToast({ title: '分类已添加', icon: 'success' });
-      this.setData({ showCategoryForm: false });
-      this.loadCustomCategories();
-    }).catch(err => {
-      console.error('Save category failed:', err);
-      wx.showToast({ title: '添加失败', icon: 'none' });
-    });
-  },
-
-  deleteCategory(e) {
-    const id = e.currentTarget.dataset.id;
-    wx.showModal({
-      title: '删除分类',
-      content: '确定要删除这个自定义分类吗？',
-      success: (res) => {
-        if (res.confirm) {
-          db.collection('categories').doc(id).remove()
-            .then(() => {
-              wx.showToast({ title: '已删除', icon: 'success' });
-              this.loadCustomCategories();
-            })
-            .catch(err => {
-              console.error('Delete category failed:', err);
-              wx.showToast({ title: '删除失败', icon: 'none' });
-            });
-        }
-      }
-    });
+  goCategoryManager() {
+    wx.navigateTo({ url: '/pages/category-manager/category-manager' });
   }
 });
