@@ -71,6 +71,9 @@
             <view class="emoji-cell {{formData.emoji === item ? 'selected' : ''}}" data-emoji="{{item}}" bindtap="selectEmoji">{{item}}</view>
           </block>
         </view>
+        <view class="manage-link" bindtap="goEmojiManager">
+          <text>管理图标 →</text>
+        </view>
       </view>
       <view class="form-row">
         <view class="form-half">
@@ -140,6 +143,9 @@
                 <block wx:for="{{emojiList}}" wx:key="*this">
                   <view class="emoji-cell {{formData.emoji === item ? 'selected' : ''}}" data-emoji="{{item}}" bindtap="selectEmoji">{{item}}</view>
                 </block>
+              </view>
+              <view class="manage-link" bindtap="goEmojiManager">
+                <text>管理图标 →</text>
               </view>
             </view>
             <view class="form-row">

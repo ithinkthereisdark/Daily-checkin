@@ -1,13 +1,12 @@
 const db = wx.cloud.database();
 const app = getApp();
 const { getAll } = require('../../utils/db');
+const { ensureEmojiLibrary } = require('../../utils/emoji');
 
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-
-const EMOJI_LIST = ['🐱','📌','✅','🏃','📚','💪','🎯','✍️','🎨','🎵','🧘','💧','🍎','💤','📝','🧹','💰','💻','🌱','🙏','⭐','🔥','❤️','📅','🎓','🏠','🍽️','🚶','🧠','📖','🎮','🐾','😺','🎀','🍥','🐈','💩'];
 
 function defaultStartDate() {
   return todayStr();
@@ -29,18 +28,30 @@ Page({
     // Management form state
     showNewForm: false,
     editingId: '',
-    emojiList: EMOJI_LIST,
+    emojiList: [],
     formData: {},
     submitting: false
   },
 
   onShow() {
+    this.loadEmojiLibrary();
     this.loadData(() => {
       if (this._pendingCheck) {
         this._pendingCheck = false;
         this.checkAllDoneAndCelebrate();
       }
     });
+  },
+
+  loadEmojiLibrary() {
+    const nickName = app.globalData.nickName;
+    ensureEmojiLibrary(nickName).then(emojis => {
+      this.setData({ emojiList: emojis });
+    });
+  },
+
+  goEmojiManager() {
+    wx.navigateTo({ url: '/pages/emoji-manager/emoji-manager' });
   },
 
   loadData(onComplete) {
@@ -157,7 +168,7 @@ Page({
       editingId: '',
       formData: {
         name: '',
-        emoji: '📌',
+        emoji: this.data.emojiList.length > 0 ? this.data.emojiList[0] : '📌',
         startDate: defaultStartDate(),
         endDate: defaultEndDate(),
         targetCount: 7,
