@@ -43,7 +43,7 @@
       <view wx:if="{{selectedCheckins.length === 0}}" class="cal-detail-empty">当天无打卡记录</view>
       <view class="checkin-list" wx:else>
         <block wx:for="{{selectedCheckins}}" wx:key="_id">
-          <view class="checkin-item">
+          <view class="checkin-item" bindlongpress="deleteRecord" data-item="{{item}}">
             <text class="item-emoji">{{item.taskEmoji}}</text>
             <view class="item-body">
               <text class="item-name">{{item.taskName}}</text>
@@ -82,7 +82,7 @@
         </view>
         <view class="checkin-list">
           <block wx:for="{{item.checkins}}" wx:key="_id">
-            <view class="checkin-item">
+            <view class="checkin-item" bindlongpress="deleteRecord" data-item="{{item}}">
               <text class="item-emoji">{{item.taskEmoji}}</text>
               <view class="item-body">
                 <text class="item-name">{{item.taskName}}</text>

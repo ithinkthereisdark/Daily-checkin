@@ -16,19 +16,21 @@ Page({
     existingId: '',
     description: '',
     imagePaths: [],   // mixed: cloud:// fileIDs (saved) + temp paths (newly selected)
-    uploading: false
+    uploading: false,
+    backfillDate: ''
   },
 
   onLoad(options) {
     const taskId = options.taskId;
-    this.setData({ taskId });
+    const backfillDate = options.date || '';
+    this.setData({ taskId, backfillDate });
 
     db.collection('tasks').doc(taskId).get().then(res => {
       this.setData({ task: res.data });
     });
 
     const nickName = app.globalData.nickName;
-    const today = todayStr();
+    const today = backfillDate || todayStr();
     db.collection('checkins').where({ taskId, nickName, date: today }).limit(100).get()
       .then(res => {
         if (res.data.length > 0) {
@@ -88,11 +90,11 @@ Page({
   },
 
   submit() {
-    const { description, imagePaths, isUpdate, existingId, taskId, uploading, task } = this.data;
+    const { description, imagePaths, isUpdate, existingId, taskId, uploading, task, backfillDate } = this.data;
     if (uploading) return;
 
     // Guard against expired/not-started task
-    const today = todayStr();
+    const today = backfillDate || todayStr();
     if (task && task.endDate < today) {
       wx.showToast({ title: '任务已过期', icon: 'none' });
       return;
@@ -135,7 +137,7 @@ Page({
 
       const data = {
         taskId,
-        date: todayStr(),
+        date: today,
         nickName: app.globalData.nickName,
         description: description.trim(),
         images,

@@ -192,6 +192,26 @@ Page({
     return days[d.getDay()];
   },
 
+  deleteRecord(e) {
+    const item = e.currentTarget.dataset.item;
+    wx.showModal({
+      title: '删除记录',
+      content: `确定删除 ${item.date}「${item.taskName}」的打卡记录吗？`,
+      success: (res) => {
+        if (!res.confirm) return;
+        db.collection('checkins').doc(item._id).remove()
+          .then(() => {
+            wx.showToast({ title: '已删除', icon: 'success' });
+            this.loadHistory();
+          })
+          .catch(err => {
+            console.error('删除失败', err);
+            wx.showToast({ title: '删除失败', icon: 'none' });
+          });
+      }
+    });
+  },
+
   previewImage(e) {
     const { url, urls } = e.currentTarget.dataset;
     if (url) {
