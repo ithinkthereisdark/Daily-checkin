@@ -13,7 +13,9 @@
  *     db.collection('checkins').where({ nickName }).orderBy('_id', 'desc').limit(limit)
  *   );
  */
-const MAX_LIMIT = 100;
+// 微信云数据库小程序端单次查询上限为 20 条（默认值）。
+// 必须与 DB 实际返回数量一致，否则 getAll 的分页循环会提前退出。
+const MAX_LIMIT = 20;
 const db = wx.cloud.database();
 
 function getAll(queryFn) {
