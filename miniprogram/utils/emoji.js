@@ -81,7 +81,7 @@ function ensureCategories(nickName) {
   return db.collection('categories').where({ nickName }).limit(1).get()
     .then(res => {
       if (res.data.length > 0) {
-        // 已有数据（可能是旧版自定义分类），不覆盖，但补充缺失的预设分类
+        // 已有数据（可能是旧版自定义分类或已 seed），直接返回
         return db.collection('categories').where({ nickName }).limit(200).get();
       }
       // 首次使用——seed 预设
