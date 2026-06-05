@@ -1,28 +1,36 @@
 /**
- * 分页拉取云数据库集合的全部数据，突破默认 20 条/单次 100 条的限制。
+ * 分页拉取云数据库集合的全部数据，突破默认 20 条限制。
  *
- * ⚠️ 重要：微信云数据库的 .skip() 必须配合 .orderBy() 使用，否则 skip 不生效，
- * 每次都会返回相同的前 N 条数据，导致死循环或数据重复。
+ * 使用游标分页（cursor-based pagination）代替 .skip()，因为微信云数据库的 .skip()
+ * 必须配合 .orderBy() 使用，且 orderBy 字段需要是唯一索引字段才能保证分页正确。
+ * 本项目使用 _id（数据库自动生成，全局唯一）作为游标，可靠且无额外索引要求。
  *
- * @param {Function} queryFn — 签名 (limit, skip) => db.collection('xxx').where(...).orderBy(...).limit(limit).skip(skip)
- * @returns {Promise<Array>} 全量数据数组
+ * @param {Function} queryFn — 签名 (limit) => db.collection('xxx').where(...).orderBy('_id', 'desc').limit(limit)
+ * @returns {Promise<Array>} 全量数据数组（按 _id 降序，即最新在前）
  *
  * 用法:
- *   const all = await getAll((limit, skip) =>
- *     db.collection('checkins').where({ nickName }).orderBy('createTime', 'desc').limit(limit).skip(skip)
+ *   const all = await getAll((limit) =>
+ *     db.collection('checkins').where({ nickName }).orderBy('_id', 'desc').limit(limit)
  *   );
  */
 const MAX_LIMIT = 100;
+const db = wx.cloud.database();
 
 function getAll(queryFn) {
   let all = [];
-  let skip = 0;
+  let lastId = null;
 
   function loop() {
-    return queryFn(MAX_LIMIT, skip).get().then(res => {
+    let query = queryFn(MAX_LIMIT);
+    // 从第二页开始，使用 _id 游标：只查询游标之前的记录
+    if (lastId) {
+      query = query.where({ _id: db.command.lt(lastId) });
+    }
+    return query.get().then(res => {
+      if (res.data.length === 0) return all;
       all = all.concat(res.data);
       if (res.data.length === MAX_LIMIT) {
-        skip += MAX_LIMIT;
+        lastId = res.data[res.data.length - 1]._id;
         return loop();
       }
       return all;

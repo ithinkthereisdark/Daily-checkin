@@ -31,7 +31,7 @@ Page({
 
     Promise.all([
       db.collection('tasks').where({ nickName }).limit(100).get(),
-      getAll((limit, skip) => db.collection('checkins').where({ nickName }).orderBy('createTime', 'desc').limit(limit).skip(skip))
+      getAll((limit) => db.collection('checkins').where({ nickName }).orderBy('_id', 'desc').limit(limit))
     ]).then(([tasksRes, allCheckins]) => {
       const taskMap = {};
       tasksRes.data.forEach(t => { taskMap[t._id] = t; });
