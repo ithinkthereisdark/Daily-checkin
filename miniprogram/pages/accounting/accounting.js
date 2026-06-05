@@ -1,8 +1,8 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { ensureEmojiLibrary } = require('../../utils/emoji');
 const _ = db.command;
 
-const LEDGER_EMOJIS = ['📒', '💰', '💵', '🏦', '💳', '📊', '💼', '🏠', '🚗', '🐱', '💎', '🎯', '📝', '❤️', '⭐', '📌'];
 
 Page({
   data: {
@@ -24,12 +24,13 @@ Page({
     showLedgerForm: false,
     newLedgerName: '',
     newLedgerEmoji: '📒',
-    ledgerEmojis: LEDGER_EMOJIS,
+    ledgerEmojis: [],
     loading: true
   },
 
   onShow() {
     this.initMonth();
+    this.loadEmojiLibrary();
     this.loadData();
   },
 
@@ -48,6 +49,13 @@ Page({
       displayMonth: `${month}月`,
       monthStart,
       monthEnd
+    });
+  },
+
+  loadEmojiLibrary() {
+    const nickName = app.globalData.nickName;
+    ensureEmojiLibrary(nickName).then(emojis => {
+      this.setData({ ledgerEmojis: emojis });
     });
   },
 
@@ -234,7 +242,7 @@ Page({
       showLedgerPicker: false,
       showLedgerForm: true,
       newLedgerName: '',
-      newLedgerEmoji: '📒'
+      newLedgerEmoji: this.data.ledgerEmojis.length > 0 ? this.data.ledgerEmojis[0] : '📒'
     });
   },
 
@@ -328,6 +336,10 @@ Page({
         }
       }
     });
+  },
+
+  goEmojiManager() {
+    wx.navigateTo({ url: '/pages/emoji-manager/emoji-manager' });
   },
 
   goStats() {

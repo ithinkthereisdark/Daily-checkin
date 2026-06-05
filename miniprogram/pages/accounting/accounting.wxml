@@ -149,6 +149,9 @@
           bindtap="selectLedgerEmoji"
         >{{item}}</view>
       </view>
+      <view class="manage-link" bindtap="goEmojiManager">
+        <text>管理图标 →</text>
+      </view>
       <view class="form-actions">
         <view class="form-btn cancel" bindtap="closeLedgerForm">取消</view>
         <view class="form-btn confirm" bindtap="createLedger">创建</view>
