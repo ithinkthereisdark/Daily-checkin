@@ -18,7 +18,7 @@ Page({
   onLoad(options) {
     const ledgerId = options.ledgerId || '';
     const nickName = app.globalData.nickName;
-    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').get()
+    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
       .then(res => {
         const ledgers = res.data;
         let ledger = ledgers[0];

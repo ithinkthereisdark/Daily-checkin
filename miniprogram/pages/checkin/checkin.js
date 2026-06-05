@@ -1,5 +1,6 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { getAll } = require('../../utils/db');
 
 function todayStr() {
   const d = new Date();
@@ -48,12 +49,12 @@ Page({
     const today = todayStr();
 
     Promise.all([
-      db.collection('tasks').where({ nickName }).orderBy('createTime', 'asc').get(),
-      db.collection('checkins').where({ nickName }).get(),
-      db.collection('checkins').where({ nickName, date: today }).get()
-    ]).then(([tasksRes, allCheckinsRes, todayCheckinsRes]) => {
+      db.collection('tasks').where({ nickName }).orderBy('createTime', 'asc').limit(100).get(),
+      getAll((limit, skip) => db.collection('checkins').where({ nickName }).limit(limit).skip(skip)),
+      db.collection('checkins').where({ nickName, date: today }).limit(100).get()
+    ]).then(([tasksRes, allCheckins, todayCheckinsRes]) => {
       const tasks = tasksRes.data;
-      const allCheckins = allCheckinsRes.data;
+      // allCheckins is already a flat array from getAll()
       const todayMap = {};
       todayCheckinsRes.data.forEach(c => { todayMap[c.taskId] = c; });
 
@@ -271,9 +272,9 @@ Page({
         if (!res.confirm) return;
         wx.showLoading({ title: '删除中' });
         // Cascade delete checkins
-        db.collection('checkins').where({ taskId: task._id }).get()
-          .then(res => {
-            const ids = res.data.map(d => d._id);
+        getAll((limit, skip) => db.collection('checkins').where({ taskId: task._id }).limit(limit).skip(skip))
+          .then(data => {
+            const ids = data.map(d => d._id);
             const delPromises = ids.length > 0
               ? ids.map(id => db.collection('checkins').doc(id).remove())
               : [];

@@ -1,5 +1,6 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { getAll } = require('../../utils/db');
 
 Page({
   data: {
@@ -29,18 +30,19 @@ Page({
     const nickName = app.globalData.nickName;
 
     Promise.all([
-      db.collection('tasks').where({ nickName }).get(),
-      db.collection('checkins').where({ nickName }).orderBy('date', 'desc').orderBy('createTime', 'desc').get()
-    ]).then(([tasksRes, checkinsRes]) => {
+      db.collection('tasks').where({ nickName }).limit(100).get(),
+      getAll((limit, skip) => db.collection('checkins').where({ nickName }).orderBy('date', 'desc').orderBy('createTime', 'desc').limit(limit).skip(skip))
+    ]).then(([tasksRes, allCheckins]) => {
       const taskMap = {};
       tasksRes.data.forEach(t => { taskMap[t._id] = t; });
 
       this._taskMap = taskMap;
-      this._allCheckins = checkinsRes.data;
+      this._allCheckins = allCheckins;
+      // allCheckins is already a flat array from getAll()
 
       // Day view groups
       const dateMap = {};
-      checkinsRes.data.forEach(c => {
+      allCheckins.forEach(c => {
         const task = taskMap[c.taskId];
         if (!dateMap[c.date]) dateMap[c.date] = [];
         dateMap[c.date].push({

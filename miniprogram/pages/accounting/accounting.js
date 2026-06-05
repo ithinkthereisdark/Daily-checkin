@@ -55,7 +55,7 @@ Page({
     this.setData({ loading: true });
     const nickName = app.globalData.nickName;
 
-    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').get()
+    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
       .then(res => {
         if (res.data.length === 0) {
           return this.createDefaultLedger().then(ledger => {

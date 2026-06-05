@@ -93,7 +93,7 @@ Page({
 
   loadLedgers() {
     const nickName = app.globalData.nickName;
-    return db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').get()
+    return db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
       .then(res => {
         const ledgers = res.data;
         let currentLedger = ledgers[0];
@@ -331,7 +331,7 @@ Page({
 
   loadCustomCategories() {
     const nickName = app.globalData.nickName;
-    return db.collection('categories').where({ nickName }).get()
+    return db.collection('categories').where({ nickName }).limit(100).get()
       .then(res => {
         this.setData({ customCategories: res.data });
         this.mergeCategories();

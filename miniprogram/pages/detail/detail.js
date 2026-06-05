@@ -28,7 +28,7 @@ Page({
 
     const nickName = app.globalData.nickName;
     const today = todayStr();
-    db.collection('checkins').where({ taskId, nickName, date: today }).get()
+    db.collection('checkins').where({ taskId, nickName, date: today }).limit(100).get()
       .then(res => {
         if (res.data.length > 0) {
           const doc = res.data[0];
