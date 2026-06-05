@@ -44,7 +44,7 @@
       <view class="checkin-list" wx:else>
         <block wx:for="{{displayTasks}}" wx:key="taskId">
           <!-- Checked in -->
-          <view wx:if="{{item.checkedIn}}" class="checkin-item" bindlongpress="deleteRecord" data-item="{{item.checkin}}">
+          <view wx:if="{{item.checkedIn}}" class="checkin-item">
             <text class="item-emoji">{{item.taskEmoji}}</text>
             <view class="item-body">
               <text class="item-name">{{item.taskName}}</text>
@@ -128,4 +128,22 @@
       <text class="empty-hint">去打卡页开始你的第一个任务吧~</text>
     </view>
   </block>
+
+  <!-- Backfill date picker overlay -->
+  <view wx:if="{{backfillTask}}" class="backfill-overlay" bindtap="cancelBackfill">
+    <view class="backfill-picker-box" catchtap>
+      <text class="backfill-picker-title">补打：{{backfillTask.emoji}} {{backfillTask.name}}</text>
+      <picker
+        mode="date"
+        start="{{backfillTask.startDate}}"
+        end="{{backfillToday}}"
+        value="{{backfillToday}}"
+        bindchange="onBackfillDateChange"
+      >
+        <view class="backfill-picker-btn">📅 点击选择日期</view>
+      </picker>
+      <view class="backfill-picker-cancel" bindtap="cancelBackfill">取消</view>
+    </view>
+  </view>
+
 </view>

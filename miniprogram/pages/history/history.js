@@ -16,15 +16,21 @@ Page({
     selectedCheckins: [],
     displayTasks: [],
     displayCount: 0,
-    checkedCount: 0
+    checkedCount: 0,
+
+    // Backfill
+    backfillTask: null,
+    backfillToday: ''
   },
 
   onShow() {
     const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     this.setData({
       currentYear: now.getFullYear(),
       currentMonth: now.getMonth() + 1,
-      monthDisplay: `${now.getFullYear()}年${now.getMonth() + 1}月`
+      monthDisplay: `${now.getFullYear()}年${now.getMonth() + 1}月`,
+      backfillToday: todayStr
     });
     this.loadHistory();
   },
@@ -257,20 +263,32 @@ Page({
   },
 
   backfillFromHistory(e) {
-    const { taskId, taskName, taskEmoji, date } = e.currentTarget.dataset;
-    const nickName = app.globalData.nickName;
+    const { taskId } = e.currentTarget.dataset;
     const task = (this._taskMap || {})[taskId];
     if (!task) return;
 
-    // 与 checkin 页保持一致的校验逻辑
     if (task.checkinCount >= task.targetCount) {
       wx.showToast({ title: '已达成目标次数', icon: 'none' });
       return;
     }
 
-    // 检查该日期是否已打卡
+    this.setData({ backfillTask: task });
+  },
+
+  cancelBackfill() {
+    this.setData({ backfillTask: null });
+  },
+
+  onBackfillDateChange(e) {
+    const date = e.detail.value;
+    const task = this.data.backfillTask;
+    if (!task) return;
+
+    this.setData({ backfillTask: null });
+    const nickName = app.globalData.nickName;
+
     db.collection('checkins')
-      .where({ taskId, nickName, date })
+      .where({ taskId: task._id, nickName, date })
       .limit(1)
       .get()
       .then(res => {
@@ -281,14 +299,14 @@ Page({
 
         if (task.needDetail) {
           wx.navigateTo({
-            url: `/pages/detail/detail?taskId=${taskId}&date=${date}`
+            url: `/pages/detail/detail?taskId=${task._id}&date=${date}`
           });
           return;
         }
 
         return db.collection('checkins').add({
           data: {
-            taskId,
+            taskId: task._id,
             date,
             nickName,
             description: '',
@@ -300,7 +318,6 @@ Page({
       .then(() => {
         if (task.needDetail) return;
         wx.showToast({ title: '已补打', icon: 'success' });
-        // 重新加载数据，完成后刷新选中日期显示
         const selDate = this.data.selectedDate;
         this.loadHistory(() => {
           if (selDate) this._selectDate(selDate);

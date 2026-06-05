@@ -361,3 +361,51 @@
   color: #D7CCC8;
   margin-top: 4rpx;
 }
+
+/* Backfill overlay */
+.backfill-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backfill-picker-box {
+  background: #FFFBF7;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  width: 520rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.15);
+}
+
+.backfill-picker-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5D4037;
+  margin-bottom: 32rpx;
+}
+
+.backfill-picker-btn {
+  display: inline-block;
+  padding: 20rpx 48rpx;
+  background: #E8905C;
+  color: #fff;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.backfill-picker-cancel {
+  display: block;
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  color: #BCAAA4;
+}
