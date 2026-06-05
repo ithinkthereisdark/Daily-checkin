@@ -16,21 +16,15 @@ Page({
     selectedCheckins: [],
     displayTasks: [],
     displayCount: 0,
-    checkedCount: 0,
-
-    // Backfill
-    backfillTask: null,
-    backfillToday: ''
+    checkedCount: 0
   },
 
   onShow() {
     const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     this.setData({
       currentYear: now.getFullYear(),
       currentMonth: now.getMonth() + 1,
-      monthDisplay: `${now.getFullYear()}年${now.getMonth() + 1}月`,
-      backfillToday: todayStr
+      monthDisplay: `${now.getFullYear()}年${now.getMonth() + 1}月`
     });
     this.loadHistory();
   },
@@ -260,73 +254,6 @@ Page({
           });
       }
     });
-  },
-
-  backfillFromHistory(e) {
-    const { taskId } = e.currentTarget.dataset;
-    const task = (this._taskMap || {})[taskId];
-    if (!task) return;
-
-    if (task.checkinCount >= task.targetCount) {
-      wx.showToast({ title: '已达成目标次数', icon: 'none' });
-      return;
-    }
-
-    this.setData({ backfillTask: task });
-  },
-
-  cancelBackfill() {
-    this.setData({ backfillTask: null });
-  },
-
-  onBackfillDateChange(e) {
-    const date = e.detail.value;
-    const task = this.data.backfillTask;
-    if (!task) return;
-
-    this.setData({ backfillTask: null });
-    const nickName = app.globalData.nickName;
-
-    db.collection('checkins')
-      .where({ taskId: task._id, nickName, date })
-      .limit(1)
-      .get()
-      .then(res => {
-        if (res.data.length > 0) {
-          wx.showToast({ title: '此日期已打卡', icon: 'none' });
-          return;
-        }
-
-        if (task.needDetail) {
-          wx.navigateTo({
-            url: `/pages/detail/detail?taskId=${task._id}&date=${date}`
-          });
-          return;
-        }
-
-        return db.collection('checkins').add({
-          data: {
-            taskId: task._id,
-            date,
-            nickName,
-            description: '',
-            images: [],
-            createTime: new Date()
-          }
-        });
-      })
-      .then(() => {
-        if (task.needDetail) return;
-        wx.showToast({ title: '已补打', icon: 'success' });
-        const selDate = this.data.selectedDate;
-        this.loadHistory(() => {
-          if (selDate) this._selectDate(selDate);
-        });
-      })
-      .catch(err => {
-        console.error('补打失败', err);
-        wx.showToast({ title: '补打失败', icon: 'none' });
-      });
   },
 
   previewImage(e) {
