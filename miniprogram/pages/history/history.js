@@ -29,10 +29,10 @@ Page({
     this.loadHistory();
   },
 
-  loadHistory() {
+  loadHistory(callback) {
     const nickName = app.globalData.nickName;
 
-    Promise.all([
+    return Promise.all([
       db.collection('tasks').where({ nickName }).limit(100).get(),
       getAll((limit) => db.collection('checkins').where({ nickName }).orderBy('_id', 'desc').limit(limit))
     ]).then(([tasksRes, allCheckins]) => {
@@ -73,6 +73,8 @@ Page({
     }).catch(err => {
       console.error('加载记录失败', err);
       wx.showToast({ title: '加载失败', icon: 'none' });
+    }).finally(() => {
+      if (callback) callback();
     });
   },
 
@@ -169,17 +171,18 @@ Page({
   tapDate(e) {
     const { date, empty, isFuture } = e.currentTarget.dataset;
     if (empty || isFuture) return;
+    this._selectDate(date);
+  },
 
+  _selectDate(date) {
     const allCheckins = this._allCheckins || [];
     const taskMap = this._taskMap || {};
 
-    // 当天打卡记录 map: taskId → checkin
     const checkinMap = {};
     allCheckins
       .filter(c => c.date === date)
       .forEach(c => { checkinMap[c.taskId] = c; });
 
-    // 当天所有活动任务
     const allTasks = Object.values(taskMap).filter(t =>
       t.startDate <= date && t.endDate >= date
     );
@@ -240,7 +243,10 @@ Page({
         db.collection('checkins').doc(item._id).remove()
           .then(() => {
             wx.showToast({ title: '已删除', icon: 'success' });
-            this.loadHistory();
+            const selDate = this.data.selectedDate;
+            this.loadHistory(() => {
+              if (selDate) this._selectDate(selDate);
+            });
           })
           .catch(err => {
             console.error('删除失败', err);
@@ -253,14 +259,33 @@ Page({
   backfillFromHistory(e) {
     const { taskId, taskName, taskEmoji, date } = e.currentTarget.dataset;
     const nickName = app.globalData.nickName;
+    const task = (this._taskMap || {})[taskId];
+    if (!task) return;
 
-    db.collection('checkins').where({ taskId, nickName }).count()
+    // 与 checkin 页保持一致的校验逻辑
+    if (task.checkinCount >= task.targetCount) {
+      wx.showToast({ title: '已达成目标次数', icon: 'none' });
+      return;
+    }
+
+    // 检查该日期是否已打卡
+    db.collection('checkins')
+      .where({ taskId, nickName, date })
+      .limit(1)
+      .get()
       .then(res => {
-        const task = (this._taskMap || {})[taskId];
-        if (task && task.targetCount && res.total >= task.targetCount) {
-          wx.showToast({ title: '已达成目标次数', icon: 'none' });
-          return Promise.reject('target reached');
+        if (res.data.length > 0) {
+          wx.showToast({ title: '此日期已打卡', icon: 'none' });
+          return;
         }
+
+        if (task.needDetail) {
+          wx.navigateTo({
+            url: `/pages/detail/detail?taskId=${taskId}&date=${date}`
+          });
+          return;
+        }
+
         return db.collection('checkins').add({
           data: {
             taskId,
@@ -273,11 +298,15 @@ Page({
         });
       })
       .then(() => {
-        wx.showToast({ title: `已补打 ${date}`, icon: 'success' });
-        this.loadHistory();
+        if (task.needDetail) return;
+        wx.showToast({ title: '已补打', icon: 'success' });
+        // 重新加载数据，完成后刷新选中日期显示
+        const selDate = this.data.selectedDate;
+        this.loadHistory(() => {
+          if (selDate) this._selectDate(selDate);
+        });
       })
       .catch(err => {
-        if (err === 'target reached') return;
         console.error('补打失败', err);
         wx.showToast({ title: '补打失败', icon: 'none' });
       });
