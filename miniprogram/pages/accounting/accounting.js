@@ -169,6 +169,8 @@ Page({
     return Object.values(groups)
       .map(g => ({
         ...g,
+        dayIncome: Math.round(g.dayIncome * 100) / 100,
+        dayExpense: Math.round(g.dayExpense * 100) / 100,
         dayTotal: Math.round((g.dayIncome - g.dayExpense) * 100) / 100
       }))
       .sort((a, b) => b.date.localeCompare(a.date));
