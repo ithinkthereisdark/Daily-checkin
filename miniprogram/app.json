@@ -7,7 +7,9 @@
     "pages/tools/tools",
     "pages/tools/audio-trim/index",
     "pages/accounting/add/add",
-    "pages/accounting/stats/stats"
+    "pages/accounting/stats/stats",
+    "pages/emoji-manager/emoji-manager",
+    "pages/category-manager/category-manager"
   ],
   "window": {
     "backgroundTextStyle": "light",
