@@ -21,6 +21,9 @@ Page({
       this._allCategories = categories;
       this.setData({ emojiLibrary });
       this.filterCategories();
+    }).catch(err => {
+      console.error('Load category data failed:', err);
+      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
     });
   },
 
