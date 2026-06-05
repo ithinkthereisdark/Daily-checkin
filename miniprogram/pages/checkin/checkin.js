@@ -133,7 +133,7 @@ Page({
           date: todayStr(),
           nickName: app.globalData.nickName,
           description: '',
-          image: '',
+          images: [],
           createTime: new Date()
         }
       }).then(() => { wx.showToast({ title: '已打卡', icon: 'success' }); })

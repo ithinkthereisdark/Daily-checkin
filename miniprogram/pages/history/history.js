@@ -44,9 +44,14 @@ Page({
       const dateMap = {};
       allCheckins.forEach(c => {
         const task = taskMap[c.taskId];
+        // Backward compat: normalize images to displayImages array
+        const displayImages = c.images && c.images.length
+          ? c.images
+          : (c.image ? [c.image] : []);
         if (!dateMap[c.date]) dateMap[c.date] = [];
         dateMap[c.date].push({
           ...c,
+          displayImages,
           taskName: task ? task.name : '(已删除)',
           taskEmoji: task ? task.emoji : '❓'
         });
@@ -168,6 +173,9 @@ Page({
       .filter(c => c.date === date)
       .map(c => ({
         ...c,
+        displayImages: c.images && c.images.length
+          ? c.images
+          : (c.image ? [c.image] : []),
         taskName: taskMap[c.taskId] ? taskMap[c.taskId].name : '(已删除)',
         taskEmoji: taskMap[c.taskId] ? taskMap[c.taskId].emoji : '❓'
       }));
@@ -185,9 +193,9 @@ Page({
   },
 
   previewImage(e) {
-    const url = e.currentTarget.dataset.url;
+    const { url, urls } = e.currentTarget.dataset;
     if (url) {
-      wx.previewImage({ urls: [url], current: url });
+      wx.previewImage({ urls: urls || [url], current: url });
     }
   }
 });

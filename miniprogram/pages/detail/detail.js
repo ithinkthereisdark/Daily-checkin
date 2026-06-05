@@ -1,6 +1,8 @@
 const db = wx.cloud.database();
 const app = getApp();
 
+const MAX_IMAGES = 3;
+
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -13,8 +15,7 @@ Page({
     isUpdate: false,
     existingId: '',
     description: '',
-    imagePath: '',
-    imageCloudID: '',
+    imagePaths: [],   // mixed: cloud:// fileIDs (saved) + temp paths (newly selected)
     uploading: false
   },
 
@@ -32,12 +33,19 @@ Page({
       .then(res => {
         if (res.data.length > 0) {
           const doc = res.data[0];
+          // Backward compat: prefer images array, fallback to single image field
+          let imagePaths = [];
+          if (doc.images && doc.images.length > 0) {
+            imagePaths = doc.images;
+          } else if (doc.image) {
+            imagePaths = [doc.image];
+          }
+
           this.setData({
             isUpdate: true,
             existingId: doc._id,
             description: doc.description || '',
-            imageCloudID: doc.image || '',
-            imagePath: doc.image || ''
+            imagePaths
           });
         }
       });
@@ -48,18 +56,39 @@ Page({
   },
 
   chooseImage() {
+    const currentCount = this.data.imagePaths.length;
+    const remaining = MAX_IMAGES - currentCount;
+    if (remaining <= 0) return;
+
     wx.chooseMedia({
-      count: 1,
+      count: remaining,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        this.setData({ imagePath: res.tempFiles[0].tempFilePath, imageCloudID: '' });
+        const newPaths = res.tempFiles.map(f => f.tempFilePath);
+        this.setData({
+          imagePaths: [...this.data.imagePaths, ...newPaths]
+        });
       }
     });
   },
 
+  removeImage(e) {
+    const index = e.currentTarget.dataset.index;
+    const imagePaths = [...this.data.imagePaths];
+    imagePaths.splice(index, 1);
+    this.setData({ imagePaths });
+  },
+
+  previewImage(e) {
+    const { url } = e.currentTarget.dataset;
+    // collect all displayable URLs (temp paths and cloud fileIDs both work)
+    const urls = this.data.imagePaths;
+    wx.previewImage({ urls, current: url });
+  },
+
   submit() {
-    const { description, imagePath, isUpdate, existingId, taskId, uploading, task } = this.data;
+    const { description, imagePaths, isUpdate, existingId, taskId, uploading, task } = this.data;
     if (uploading) return;
 
     // Guard against expired/not-started task
@@ -73,7 +102,7 @@ Page({
       return;
     }
 
-    if (!description.trim() && !imagePath) {
+    if (!description.trim() && imagePaths.length === 0) {
       wx.showToast({ title: '请填写描述或添加图片', icon: 'none' });
       return;
     }
@@ -81,27 +110,41 @@ Page({
     this.setData({ uploading: true });
     wx.showLoading({ title: '提交中' });
 
-    const uploadPromise = imagePath && !imagePath.startsWith('cloud://')
-      ? wx.cloud.uploadFile({
-          cloudPath: 'checkins/' + Date.now() + '.jpg',
-          filePath: imagePath
-        })
-      : Promise.resolve({ fileID: imagePath || '' });
+    // Separate: cloud fileIDs (already uploaded) vs temp paths (need upload)
+    const cloudFiles = imagePaths.filter(p => p.startsWith('cloud://'));
+    const newPaths = imagePaths.filter(p => !p.startsWith('cloud://'));
 
-    uploadPromise.then(uploadRes => {
-      const image = uploadRes.fileID || '';
+    const uploadPromises = newPaths.map(path =>
+      wx.cloud.uploadFile({
+        cloudPath: 'checkins/' + Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg',
+        filePath: path
+      })
+    );
+
+    Promise.allSettled(uploadPromises).then(results => {
+      const uploadedFileIDs = results
+        .filter(r => r.status === 'fulfilled')
+        .map(r => r.value.fileID);
+
+      if (uploadedFileIDs.length < newPaths.length) {
+        console.warn(`${newPaths.length - uploadedFileIDs.length} images failed to upload`);
+      }
+
+      // Combine previously-saved cloud files with newly uploaded ones
+      const images = [...cloudFiles, ...uploadedFileIDs];
+
       const data = {
         taskId,
         date: todayStr(),
         nickName: app.globalData.nickName,
         description: description.trim(),
-        image,
+        images,
         createTime: new Date()
       };
 
       if (isUpdate) {
         return db.collection('checkins').doc(existingId).update({
-          data: { description: data.description, image: data.image }
+          data: { description: data.description, images: data.images }
         });
       }
       return db.collection('checkins').add({ data });

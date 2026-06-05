@@ -116,12 +116,19 @@
   line-height: 1.5;
 }
 
+.item-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
 .item-image {
   width: 200rpx;
   height: 200rpx;
   border-radius: 14rpx;
-  margin-top: 14rpx;
   background: #F5F0EB;
+  flex-shrink: 0;
 }
 
 /* Decorative tail dots */

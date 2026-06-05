@@ -21,15 +21,31 @@
       maxlength="500">
     </textarea>
 
-    <view wx:if="{{imagePath}}" class="image-area">
-      <image src="{{imagePath}}" mode="aspectFill" class="preview-img"></image>
-      <text class="img-tip">点击下方按钮可更换图片</text>
+    <!-- Multi-image grid -->
+    <view wx:if="{{imagePaths.length > 0}}" class="image-grid">
+      <view class="image-cell" wx:for="{{imagePaths}}" wx:key="*this">
+        <image
+          src="{{item}}"
+          mode="aspectFill"
+          class="preview-img"
+          data-url="{{item}}"
+          bindtap="previewImage">
+        </image>
+        <view class="delete-btn" data-index="{{index}}" catchtap="removeImage">
+          <text class="delete-icon">✕</text>
+        </view>
+      </view>
+      <view
+        wx:if="{{imagePaths.length < 3}}"
+        class="image-cell image-add"
+        bindtap="chooseImage">
+        <text class="add-icon">+</text>
+        <text class="add-label">添加照片</text>
+      </view>
     </view>
 
-    <view class="btn-group">
-      <button type="default" bindtap="chooseImage" class="img-btn">
-        {{imagePath ? '📷 更换照片' : '📷 添加照片'}}
-      </button>
+    <view wx:else class="btn-group">
+      <button type="default" bindtap="chooseImage" class="img-btn">📷 添加照片</button>
     </view>
 
     <view class="btn-group">
