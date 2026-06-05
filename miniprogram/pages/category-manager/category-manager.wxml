@@ -47,6 +47,9 @@
           bindtap="selectEmoji"
         >{{item}}</view>
       </view>
+      <view class="manage-link" bindtap="goEmojiManager">
+        <text>管理图标 →</text>
+      </view>
 
       <input
         class="form-input"

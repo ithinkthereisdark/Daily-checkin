@@ -1,5 +1,6 @@
 // miniprogram/utils/emoji.js
 const db = wx.cloud.database();
+const { getAll } = require('./db');
 
 // ===== 预设 Emoji 列表（合并 checkin + accounting + add 三处并去重）=====
 const PRESET_EMOJIS = [
@@ -46,9 +47,10 @@ function ensureEmojiLibrary(nickName) {
   return db.collection('emoji_library').where({ nickName }).limit(1).get()
     .then(res => {
       if (res.data.length > 0) {
-        // 已有数据，直接返回
-        return db.collection('emoji_library').where({ nickName })
-          .orderBy('createTime', 'asc').limit(200).get();
+        // 已有数据，使用 getAll 突破 20 条限制
+        return getAll((limit) =>
+          db.collection('emoji_library').where({ nickName }).orderBy('_id', 'desc').limit(limit)
+        );
       }
       // 首次使用——seed 预设
       const batch = PRESET_EMOJIS.map(emoji => ({
@@ -56,18 +58,22 @@ function ensureEmojiLibrary(nickName) {
         nickName,
         createTime: new Date()
       }));
-      // 逐条添加（云数据库不支持批量 add）
       return Promise.all(batch.map(data =>
         db.collection('emoji_library').add({ data })
       )).then(() =>
-        db.collection('emoji_library').where({ nickName })
-          .orderBy('createTime', 'asc').limit(200).get()
+        getAll((limit) =>
+          db.collection('emoji_library').where({ nickName }).orderBy('_id', 'desc').limit(limit)
+        )
       );
     })
-    .then(res => res.data.map(item => item.emoji))
+    .then(data => {
+      // getAll 返回 _id desc，这里按 createTime asc 排序后提取 emoji
+      return data
+        .sort((a, b) => (a.createTime || 0) - (b.createTime || 0))
+        .map(item => item.emoji);
+    })
     .catch(err => {
       console.error('Load emoji_library failed:', err);
-      // Fallback: 返回预设列表
       return [...PRESET_EMOJIS];
     });
 }
@@ -81,8 +87,10 @@ function ensureCategories(nickName) {
   return db.collection('categories').where({ nickName }).limit(1).get()
     .then(res => {
       if (res.data.length > 0) {
-        // 已有数据（可能是旧版自定义分类或已 seed），直接返回
-        return db.collection('categories').where({ nickName }).limit(200).get();
+        // 已有数据，使用 getAll 突破 20 条限制
+        return getAll((limit) =>
+          db.collection('categories').where({ nickName }).orderBy('_id', 'desc').limit(limit)
+        );
       }
       // 首次使用——seed 预设
       return Promise.all(PRESET_CATEGORIES.map(cat =>
@@ -97,13 +105,14 @@ function ensureCategories(nickName) {
           }
         })
       )).then(() =>
-        db.collection('categories').where({ nickName }).limit(200).get()
+        getAll((limit) =>
+          db.collection('categories').where({ nickName }).orderBy('_id', 'desc').limit(limit)
+        )
       );
     })
-    .then(res => res.data)
+    .then(data => data)
     .catch(err => {
       console.error('Load categories failed:', err);
-      // Fallback: 返回预设分类（带上 isPreset）
       return PRESET_CATEGORIES.map((c, i) => ({ ...c, isPreset: true, _id: 'fallback_' + i }));
     });
 }

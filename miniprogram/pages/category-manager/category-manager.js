@@ -59,6 +59,10 @@ Page({
     this.setData({ showAddForm: false });
   },
 
+  goEmojiManager() {
+    wx.navigateTo({ url: '/pages/emoji-manager/emoji-manager' });
+  },
+
   onCategoryNameInput(e) {
     this.setData({ newCategoryName: e.detail.value });
   },

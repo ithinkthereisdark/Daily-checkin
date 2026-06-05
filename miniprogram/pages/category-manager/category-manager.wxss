@@ -202,3 +202,11 @@
   background: #E8905C;
   color: #fff;
 }
+
+.manage-link {
+  text-align: right;
+  margin-top: 8rpx;
+  margin-bottom: 16rpx;
+  font-size: 24rpx;
+  color: #E8905C;
+}
