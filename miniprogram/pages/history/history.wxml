@@ -38,28 +38,38 @@
     <view wx:if="{{selectedDate}}" class="cal-detail">
       <view class="cal-detail-header">
         <text class="cal-detail-date">{{selectedDate}}</text>
-        <text class="cal-detail-count" wx:if="{{selectedCheckins.length > 0}}">{{selectedCheckins.length}}条记录</text>
+        <text class="cal-detail-count" wx:if="{{displayCount > 0}}">{{checkedCount}}/{{displayCount}} 已打卡</text>
       </view>
-      <view wx:if="{{selectedCheckins.length === 0}}" class="cal-detail-empty">当天无打卡记录</view>
+      <view wx:if="{{displayTasks.length === 0}}" class="cal-detail-empty">当天无任务</view>
       <view class="checkin-list" wx:else>
-        <block wx:for="{{selectedCheckins}}" wx:key="_id">
-          <view class="checkin-item" bindlongpress="deleteRecord" data-item="{{item}}">
+        <block wx:for="{{displayTasks}}" wx:key="taskId">
+          <!-- Checked in -->
+          <view wx:if="{{item.checkedIn}}" class="checkin-item" bindlongpress="deleteRecord" data-item="{{item.checkin}}">
             <text class="item-emoji">{{item.taskEmoji}}</text>
             <view class="item-body">
               <text class="item-name">{{item.taskName}}</text>
-              <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
-              <view wx:if="{{item.displayImages.length > 0}}" class="item-images">
+              <text wx:if="{{item.checkin.description}}" class="item-desc">{{item.checkin.description}}</text>
+              <view wx:if="{{item.checkin.displayImages.length > 0}}" class="item-images">
                 <image
-                  wx:for="{{item.displayImages}}"
+                  wx:for="{{item.checkin.displayImages}}"
+                  wx:for-item="img"
                   wx:key="*this"
-                  src="{{item}}"
+                  src="{{img}}"
                   mode="aspectFill"
                   class="item-image"
-                  data-url="{{item}}"
-                  data-urls="{{item.displayImages}}"
+                  data-url="{{img}}"
+                  data-urls="{{item.checkin.displayImages}}"
                   bindtap="previewImage">
                 </image>
               </view>
+            </view>
+          </view>
+          <!-- Not checked in -->
+          <view wx:else class="checkin-item unchecked" bindlongpress="backfillFromHistory" data-task-id="{{item.taskId}}" data-task-name="{{item.taskName}}" data-task-emoji="{{item.taskEmoji}}" data-date="{{selectedDate}}">
+            <text class="item-emoji unchecked-emoji">{{item.taskEmoji}}</text>
+            <view class="item-body">
+              <text class="item-name unchecked-name">{{item.taskName}}</text>
+              <text class="unchecked-hint">未打卡</text>
             </view>
           </view>
         </block>

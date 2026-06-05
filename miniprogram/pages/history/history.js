@@ -13,7 +13,10 @@ Page({
     monthDisplay: '',
     calendarGrid: [],
     selectedDate: '',
-    selectedCheckins: []
+    selectedCheckins: [],
+    displayTasks: [],
+    displayCount: 0,
+    checkedCount: 0
   },
 
   onShow() {
@@ -169,20 +172,55 @@ Page({
 
     const allCheckins = this._allCheckins || [];
     const taskMap = this._taskMap || {};
-    const dateCheckins = allCheckins
+
+    // 当天打卡记录 map: taskId → checkin
+    const checkinMap = {};
+    allCheckins
       .filter(c => c.date === date)
-      .map(c => ({
+      .forEach(c => { checkinMap[c.taskId] = c; });
+
+    // 当天所有活动任务
+    const allTasks = Object.values(taskMap).filter(t =>
+      t.startDate <= date && t.endDate >= date
+    );
+
+    const displayTasks = allTasks.map(task => {
+      const checkin = checkinMap[task._id];
+      return {
+        taskId: task._id,
+        taskName: task.name,
+        taskEmoji: task.emoji,
+        checkedIn: !!checkin,
+        checkin: checkin ? {
+          _id: checkin._id,
+          description: checkin.description || '',
+          displayImages: checkin.images && checkin.images.length
+            ? checkin.images
+            : (checkin.image ? [checkin.image] : []),
+          date: checkin.date
+        } : null
+      };
+    });
+
+    displayTasks.sort((a, b) => {
+      if (a.checkedIn && !b.checkedIn) return -1;
+      if (!a.checkedIn && b.checkedIn) return 1;
+      return 0;
+    });
+
+    this.setData({
+      selectedDate: date,
+      displayTasks,
+      displayCount: displayTasks.length,
+      checkedCount: displayTasks.filter(t => t.checkedIn).length,
+      selectedCheckins: allCheckins.filter(c => c.date === date).map(c => ({
         ...c,
         displayImages: c.images && c.images.length
           ? c.images
           : (c.image ? [c.image] : []),
         taskName: taskMap[c.taskId] ? taskMap[c.taskId].name : '(已删除)',
         taskEmoji: taskMap[c.taskId] ? taskMap[c.taskId].emoji : '❓'
-      }));
-
-    this.setData({
-      selectedDate: date,
-      selectedCheckins: dateCheckins
+      }))
     });
   },
 
@@ -210,6 +248,39 @@ Page({
           });
       }
     });
+  },
+
+  backfillFromHistory(e) {
+    const { taskId, taskName, taskEmoji, date } = e.currentTarget.dataset;
+    const nickName = app.globalData.nickName;
+
+    db.collection('checkins').where({ taskId, nickName }).count()
+      .then(res => {
+        const task = (this._taskMap || {})[taskId];
+        if (task && task.targetCount && res.total >= task.targetCount) {
+          wx.showToast({ title: '已达成目标次数', icon: 'none' });
+          return Promise.reject('target reached');
+        }
+        return db.collection('checkins').add({
+          data: {
+            taskId,
+            date,
+            nickName,
+            description: '',
+            images: [],
+            createTime: new Date()
+          }
+        });
+      })
+      .then(() => {
+        wx.showToast({ title: `已补打 ${date}`, icon: 'success' });
+        this.loadHistory();
+      })
+      .catch(err => {
+        if (err === 'target reached') return;
+        console.error('补打失败', err);
+        wx.showToast({ title: '补打失败', icon: 'none' });
+      });
   },
 
   previewImage(e) {
