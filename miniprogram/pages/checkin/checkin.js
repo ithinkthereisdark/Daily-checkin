@@ -50,7 +50,7 @@ Page({
 
     Promise.all([
       db.collection('tasks').where({ nickName }).orderBy('createTime', 'asc').limit(100).get(),
-      getAll((limit, skip) => db.collection('checkins').where({ nickName }).limit(limit).skip(skip)),
+      getAll((limit, skip) => db.collection('checkins').where({ nickName }).orderBy('createTime', 'desc').limit(limit).skip(skip)),
       db.collection('checkins').where({ nickName, date: today }).limit(100).get()
     ]).then(([tasksRes, allCheckins, todayCheckinsRes]) => {
       const tasks = tasksRes.data;
@@ -272,7 +272,7 @@ Page({
         if (!res.confirm) return;
         wx.showLoading({ title: '删除中' });
         // Cascade delete checkins
-        getAll((limit, skip) => db.collection('checkins').where({ taskId: task._id }).limit(limit).skip(skip))
+        getAll((limit, skip) => db.collection('checkins').where({ taskId: task._id }).orderBy('createTime', 'desc').limit(limit).skip(skip))
           .then(data => {
             const ids = data.map(d => d._id);
             const delPromises = ids.length > 0
