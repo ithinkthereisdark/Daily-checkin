@@ -551,43 +551,50 @@
   color: #E8905C;
 }
 
-/* Backfill bar */
-.backfill-bar {
+/* Backfill overlay */
+.backfill-overlay {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  background: #FFFBF7;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  box-shadow: 0 -2rpx 16rpx rgba(180,140,120,0.12);
-  z-index: 100;
+  justify-content: center;
 }
 
-.backfill-label {
-  flex: 1;
-  font-size: 26rpx;
+.backfill-picker-box {
+  background: #FFFBF7;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  width: 520rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.15);
+}
+
+.backfill-picker-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
   color: #5D4037;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-bottom: 32rpx;
 }
 
-.backfill-picker {
-  padding: 12rpx 24rpx;
+.backfill-picker-btn {
+  display: inline-block;
+  padding: 20rpx 48rpx;
   background: #E8905C;
   color: #fff;
-  border-radius: 12rpx;
-  font-size: 26rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
   font-weight: 600;
 }
 
-.backfill-cancel {
-  padding: 12rpx 16rpx;
-  color: #BCAAA4;
+.backfill-picker-cancel {
+  display: block;
+  margin-top: 24rpx;
   font-size: 26rpx;
+  color: #BCAAA4;
 }

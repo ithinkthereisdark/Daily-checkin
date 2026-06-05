@@ -196,19 +196,21 @@
     </view>
   </view>
 
-  <!-- Backfill bar -->
-  <view wx:if="{{backfillTask}}" class="backfill-bar">
-    <text class="backfill-label">补打：{{backfillTask.emoji}} {{backfillTask.name}}</text>
-    <picker
-      mode="date"
-      start="{{backfillTask.startDate}}"
-      end="{{backfillToday}}"
-      value="{{backfillToday}}"
-      bindchange="onBackfillDateChange"
-    >
-      <view class="backfill-picker">📅 选择日期</view>
-    </picker>
-    <view class="backfill-cancel" bindtap="cancelBackfill">取消</view>
+  <!-- Backfill date picker overlay -->
+  <view wx:if="{{backfillTask}}" class="backfill-overlay" bindtap="cancelBackfill">
+    <view class="backfill-picker-box" catchtap>
+      <text class="backfill-picker-title">补打：{{backfillTask.emoji}} {{backfillTask.name}}</text>
+      <picker
+        mode="date"
+        start="{{backfillTask.startDate}}"
+        end="{{backfillToday}}"
+        value="{{backfillToday}}"
+        bindchange="onBackfillDateChange"
+      >
+        <view class="backfill-picker-btn">📅 点击选择日期</view>
+      </picker>
+      <view class="backfill-picker-cancel" bindtap="cancelBackfill">取消</view>
+    </view>
   </view>
 
 </view>
