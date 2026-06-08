@@ -1,5 +1,6 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { getAll } = require('../../../utils/db');
 const _ = db.command;
 
 Page({
@@ -18,9 +19,8 @@ Page({
   onLoad(options) {
     const ledgerId = options.ledgerId || '';
     const nickName = app.globalData.nickName;
-    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
-      .then(res => {
-        const ledgers = res.data;
+    getAll((limit) => db.collection('ledgers').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+      .then(ledgers => {
         let ledger = ledgers[0];
         if (ledgerId) {
           const found = ledgers.find(l => l._id === ledgerId);
@@ -70,17 +70,16 @@ Page({
 
     this.setData({ dateStart, dateEnd });
 
-    db.collection('transactions')
-      .where({
-        nickName: app.globalData.nickName,
-        ledgerId: currentLedger._id,
-        date: _.gte(dateStart).and(_.lte(dateEnd))
-      })
-      .orderBy('date', 'asc')
-      .limit(1000)
-      .get()
-      .then(res => {
-        const transactions = res.data;
+    getAll((limit) =>
+      db.collection('transactions')
+        .where({
+          nickName: app.globalData.nickName,
+          ledgerId: currentLedger._id,
+          date: _.gte(dateStart).and(_.lte(dateEnd))
+        })
+        .orderBy('_id', 'desc')
+        .limit(limit)
+    ).then(transactions => {
         this._rawTransactions = transactions;
         this.calcSummary(transactions);
         this.buildTrendData(transactions);

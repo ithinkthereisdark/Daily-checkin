@@ -1,6 +1,7 @@
 const db = wx.cloud.database();
 const app = getApp();
 const { ensureCategories } = require('../../../utils/emoji');
+const { getAll } = require('../../../utils/db');
 
 function evaluate(expr) {
   expr = expr.replace(/[+\-]$/, '');
@@ -69,9 +70,8 @@ Page({
 
   loadLedgers() {
     const nickName = app.globalData.nickName;
-    return db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
-      .then(res => {
-        const ledgers = res.data;
+    return getAll((limit) => db.collection('ledgers').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+      .then(ledgers => {
         let currentLedger = ledgers[0];
 
         const lastId = this.data.preferredLedgerId || wx.getStorageSync('lastLedgerId');

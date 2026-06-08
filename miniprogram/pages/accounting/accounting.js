@@ -1,6 +1,7 @@
 const db = wx.cloud.database();
 const app = getApp();
 const { ensureEmojiLibrary } = require('../../utils/emoji');
+const { getAll } = require('../../utils/db');
 const _ = db.command;
 
 
@@ -63,14 +64,14 @@ Page({
     this.setData({ loading: true });
     const nickName = app.globalData.nickName;
 
-    db.collection('ledgers').where({ nickName }).orderBy('createTime', 'asc').limit(100).get()
-      .then(res => {
-        if (res.data.length === 0) {
+    getAll((limit) => db.collection('ledgers').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+      .then(data => {
+        if (data.length === 0) {
           return this.createDefaultLedger().then(ledger => {
             this.setData({ ledgers: [ledger], currentLedger: ledger });
           });
         }
-        const ledgers = res.data;
+        const ledgers = data;
         const lastId = wx.getStorageSync('lastLedgerId');
         let currentLedger = null;
         if (lastId) currentLedger = ledgers.find(l => l._id === lastId);
@@ -115,18 +116,16 @@ Page({
 
   loadTransactions() {
     const { currentLedger, monthStart, monthEnd } = this.data;
-    db.collection('transactions')
-      .where({
-        nickName: app.globalData.nickName,
-        ledgerId: currentLedger._id,
-        date: _.gte(monthStart).and(_.lte(monthEnd))
-      })
-      .orderBy('date', 'desc')
-      .orderBy('createTime', 'desc')
-      .limit(500)
-      .get()
-      .then(res => {
-        const transactions = res.data;
+    getAll((limit) =>
+      db.collection('transactions')
+        .where({
+          nickName: app.globalData.nickName,
+          ledgerId: currentLedger._id,
+          date: _.gte(monthStart).and(_.lte(monthEnd))
+        })
+        .orderBy('_id', 'desc')
+        .limit(limit)
+    ).then(transactions => {
         const grouped = this.groupTransactions(transactions);
         const { monthlyIncome, monthlyExpense } = this.calcSummary(transactions);
         this.setData({
