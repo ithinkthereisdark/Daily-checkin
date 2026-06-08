@@ -13,10 +13,24 @@ Page({
     rankList: [],
     pieData: [],
     trendDays: [],
-    trendData: []
+    trendData: [],
+
+    // Month picker
+    monthKey: '',
+    displayYear: '',
+    displayMonth: ''
   },
 
   onLoad(options) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    this.setData({
+      monthKey: `${year}-${String(month).padStart(2, '0')}`,
+      displayYear: `${year}`,
+      displayMonth: `${month}月`
+    });
+
     const ledgerId = options.ledgerId || '';
     const nickName = app.globalData.nickName;
     getAll((limit) => db.collection('ledgers').where({ nickName }).orderBy('_id', 'desc').limit(limit))
@@ -44,6 +58,17 @@ Page({
       });
   },
 
+  selectMonth(e) {
+    const val = e.detail.value;
+    const [year, month] = val.split('-');
+    this.setData({
+      monthKey: val,
+      displayYear: year,
+      displayMonth: `${parseInt(month)}月`
+    });
+    this.loadData();
+  },
+
   switchTrendType(e) {
     const type = e.currentTarget.dataset.type;
     this.setData({ trendType: type });
@@ -58,15 +83,13 @@ Page({
   },
 
   loadData() {
-    const { currentLedger } = this.data;
+    const { currentLedger, monthKey } = this.data;
     if (!currentLedger) return;
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const lastDay = new Date(year, month, 0).getDate();
-    const dateStart = `${year}-${String(month).padStart(2, '0')}-01`;
-    const dateEnd = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    const [year, month] = monthKey.split('-');
+    const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+    const dateStart = `${monthKey}-01`;
+    const dateEnd = `${monthKey}-${String(lastDay).padStart(2, '0')}`;
 
     this.setData({ dateStart, dateEnd });
 

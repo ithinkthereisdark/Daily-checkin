@@ -5,6 +5,12 @@
       <text>{{currentLedger.emoji}} {{currentLedger.name}}</text>
     </view>
     <view class="top-row2">
+      <picker mode="date" fields="month" value="{{monthKey}}" bindchange="selectMonth">
+        <view class="month-picker">
+          <text class="mp-year">{{displayYear}}</text>
+          <text class="mp-month">{{displayMonth}} ▼</text>
+        </view>
+      </picker>
       <view class="summary">
         <view class="summary-item">
           <text class="summary-label">收入</text>
