@@ -375,3 +375,15 @@
   color: #D4A099;
   margin-top: 4rpx;
 }
+
+.backfill-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #E8905C;
+  background: #FFF2EC;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  margin-left: 8rpx;
+  vertical-align: middle;
+  font-weight: 500;
+}

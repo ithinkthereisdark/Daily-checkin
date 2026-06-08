@@ -220,6 +220,7 @@ Page({
             nickName: app.globalData.nickName,
             description: '',
             images: [],
+            isBackfill: true,
             createTime: new Date()
           }
         });

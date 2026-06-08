@@ -47,7 +47,7 @@
           <view wx:if="{{item.checkedIn}}" class="checkin-item">
             <text class="item-emoji">{{item.taskEmoji}}</text>
             <view class="item-body">
-              <text class="item-name">{{item.taskName}}</text>
+              <text class="item-name">{{item.taskName}}<text wx:if="{{item.checkin.isBackfill}}" class="backfill-tag">补</text></text>
               <text wx:if="{{item.checkin.description}}" class="item-desc">{{item.checkin.description}}</text>
               <view wx:if="{{item.checkin.displayImages.length > 0}}" class="item-images">
                 <image
@@ -95,7 +95,7 @@
             <view class="checkin-item" bindlongpress="deleteRecord" data-item="{{item}}">
               <text class="item-emoji">{{item.taskEmoji}}</text>
               <view class="item-body">
-                <text class="item-name">{{item.taskName}}</text>
+                <text class="item-name">{{item.taskName}}<text wx:if="{{item.isBackfill}}" class="backfill-tag">补</text></text>
                 <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
                 <view wx:if="{{item.displayImages.length > 0}}" class="item-images">
                   <image

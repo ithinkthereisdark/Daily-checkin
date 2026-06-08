@@ -200,7 +200,8 @@ Page({
           displayImages: checkin.images && checkin.images.length
             ? checkin.images
             : (checkin.image ? [checkin.image] : []),
-          date: checkin.date
+          date: checkin.date,
+          isBackfill: checkin.isBackfill
         } : null
       };
     });

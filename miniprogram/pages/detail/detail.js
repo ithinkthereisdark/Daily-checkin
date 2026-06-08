@@ -141,6 +141,7 @@ Page({
         nickName: app.globalData.nickName,
         description: description.trim(),
         images,
+        isBackfill: !!backfillDate,
         createTime: new Date()
       };
 
