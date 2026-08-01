@@ -1,6 +1,7 @@
 const db = wx.cloud.database();
 const app = getApp();
 const { getAll } = require('../../utils/db');
+const { revokeByActionId } = require('../../utils/points');
 
 Page({
   data: {
@@ -243,6 +244,7 @@ Page({
         if (!res.confirm) return;
         db.collection('checkins').doc(item._id).remove()
           .then(() => {
+            revokeByActionId(item._id, app.globalData.nickName);
             wx.showToast({ title: '已删除', icon: 'success' });
             const selDate = this.data.selectedDate;
             this.loadHistory(() => {

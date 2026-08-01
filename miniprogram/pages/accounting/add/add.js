@@ -2,6 +2,7 @@ const db = wx.cloud.database();
 const app = getApp();
 const { ensureCategories } = require('../../../utils/emoji');
 const { getAll } = require('../../../utils/db');
+const { awardAccounting } = require('../../../utils/points');
 
 function evaluate(expr) {
   expr = expr.replace(/[+\-]$/, '');
@@ -273,8 +274,10 @@ Page({
         });
     } else {
       db.collection('transactions').add({ data })
-        .then(() => {
-          wx.showToast({ title: '记账成功', icon: 'success' });
+        .then((res) => {
+          const note = selectedCategory + (description.trim() ? ' ' + description.trim() : '');
+          const plan = awardAccounting(res._id, nickName, date, note);
+          wx.showToast({ title: '记账成功 +' + (plan.base + plan.critExtra) + (plan.critExtra ? ' ⚡' : ''), icon: 'success' });
           setTimeout(() => wx.navigateBack(), 600);
         })
         .catch(err => {

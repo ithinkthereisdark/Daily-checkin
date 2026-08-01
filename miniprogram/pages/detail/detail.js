@@ -1,5 +1,6 @@
 const db = wx.cloud.database();
 const app = getApp();
+const { awardCheckin, maybeAwardTaskCompletion } = require('../../utils/points');
 
 const MAX_IMAGES = 3;
 
@@ -148,12 +149,19 @@ Page({
       if (isUpdate) {
         return db.collection('checkins').doc(existingId).update({
           data: { description: data.description, images: data.images }
-        });
+        }).then(() => null);
       }
-      return db.collection('checkins').add({ data });
-    }).then(() => {
+      return db.collection('checkins').add({ data }).then(res => res._id);
+    }).then((newId) => {
       wx.hideLoading();
-      wx.showToast({ title: isUpdate ? '已更新' : '打卡成功', icon: 'success' });
+      if (newId && !backfillDate) {
+        // 新增打卡才加分；编辑/补打不加
+        const plan = awardCheckin(newId, app.globalData.nickName, today, task ? task.name : '');
+        if (task) maybeAwardTaskCompletion(taskId, app.globalData.nickName, task.targetCount, task.name);
+        wx.showToast({ title: '打卡成功 +' + (plan.base + plan.critExtra) + (plan.critExtra ? ' ⚡' : ''), icon: 'success' });
+      } else {
+        wx.showToast({ title: isUpdate ? '已更新' : '打卡成功', icon: 'success' });
+      }
       setTimeout(() => { wx.navigateBack(); }, 600);
     }).catch(err => {
       wx.hideLoading();

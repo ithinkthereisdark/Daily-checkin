@@ -1,0 +1,59 @@
+<view class="page">
+  <!-- Balance Header -->
+  <view class="points-header">
+    <text class="points-label">我的积分</text>
+    <text class="points-balance">{{balance}}</text>
+    <view class="points-stats">
+      <view class="stat-item">
+        <text class="stat-value">{{todayNet > 0 ? '+' : ''}}{{todayNet}}</text>
+        <text class="stat-label">今日积分</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{monthNet > 0 ? '+' : ''}}{{monthNet}}</text>
+        <text class="stat-label">本月积分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Ledger List -->
+  <scroll-view scroll-y class="tx-list" wx:if="{{!loading}}">
+    <view wx:if="{{groups.length === 0}}" class="empty">
+      <text class="empty-emoji">⭐</text>
+      <text class="empty-text">暂无积分记录</text>
+      <text class="empty-hint">打卡和记账都能赚积分哦</text>
+    </view>
+
+    <view class="date-group" wx:for="{{groups}}" wx:key="date">
+      <view class="date-header">
+        <view class="date-left">
+          <view class="date-dot"></view>
+          <text class="date-text">{{item.date}}</text>
+          <text class="date-weekday">{{item.weekday}}</text>
+        </view>
+        <view class="date-summary">
+          <text class="day-total {{item.dayTotal >= 0 ? 'positive' : 'negative'}}">{{item.dayTotal >= 0 ? '+' : ''}}{{item.dayTotal}}</text>
+        </view>
+      </view>
+
+      <view class="tx-card">
+        <view class="tx-row" wx:for="{{item.records}}" wx:for-item="r" wx:key="_id">
+          <text class="tx-emoji">{{r.emoji}}</text>
+          <view class="tx-info">
+            <text class="tx-category">{{r.label}}</text>
+            <text wx:if="{{r.note}}" class="tx-desc">{{r.note}}</text>
+          </view>
+          <view class="tx-divider"></view>
+          <text class="tx-amount {{r.points >= 0 ? 'positive' : 'negative'}}">{{r.points >= 0 ? '+' : ''}}{{r.points}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="list-bottom"></view>
+  </scroll-view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

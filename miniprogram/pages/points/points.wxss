@@ -1,0 +1,250 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #FFF5EC;
+}
+
+/* ======== Balance Header ======== */
+.points-header {
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 14rpx rgba(180,140,120,0.06);
+  margin: 20rpx;
+  padding: 32rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.points-label {
+  font-size: 24rpx;
+  color: #8D7B72;
+}
+
+.points-balance {
+  font-size: 88rpx;
+  font-weight: 700;
+  color: #E8905C;
+  line-height: 1.2;
+  margin: 8rpx 0 16rpx;
+}
+
+.points-stats {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.stat-value {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5D4037;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #BCAAA4;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 36rpx;
+  background: #E0D5CC;
+}
+
+/* ======== Ledger List ======== */
+.tx-list {
+  flex: 1;
+  height: 0;
+  padding: 0 20rpx 16rpx;
+}
+
+.list-bottom {
+  height: 40rpx;
+}
+
+.date-group {
+  margin-bottom: 32rpx;
+}
+
+.date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14rpx;
+  padding: 0 20rpx 0 8rpx;
+}
+
+.date-summary {
+  display: flex;
+  gap: 12rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: 0 20rpx 0 8rpx;
+}
+
+.date-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.date-dot {
+  width: 10rpx;
+  height: 10rpx;
+  background: #E8905C;
+  border-radius: 50%;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.date-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #5D4037;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date-weekday {
+  font-size: 22rpx;
+  color: #BCAAA4;
+  flex-shrink: 0;
+}
+
+.day-total {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  min-height: 40rpx;   /* 至少与日期行等高，文字垂直居中 */
+}
+
+.tx-card {
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 14rpx rgba(180,140,120,0.06);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid #F5F0EB;
+  gap: 10rpx;
+}
+
+.tx-row:last-child {
+  border-bottom: none;
+}
+
+.tx-emoji {
+  font-size: 38rpx;
+  flex-shrink: 0;
+  width: 48rpx;
+  text-align: center;
+}
+
+.tx-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.tx-category {
+  font-size: 28rpx;
+  color: #5D4037;
+  font-weight: 600;
+}
+
+.tx-desc {
+  font-size: 24rpx;
+  color: #BCAAA4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tx-divider {
+  width: 1rpx;
+  height: 36rpx;
+  background: #E0D5CC;
+  flex-shrink: 0;
+}
+
+.tx-amount {
+  font-size: 28rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  min-height: 36rpx;   /* 至少与分割线等高，文字垂直居中 */
+  min-width: 150rpx;
+  text-align: left;
+  box-sizing: border-box;
+  padding-left: 12rpx;
+}
+
+.positive {
+  color: #2E7D32;
+}
+
+.negative {
+  color: #C62828;
+}
+
+/* ======== Empty State ======== */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120rpx;
+}
+
+.empty-emoji {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #BCAAA4;
+  display: block;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #C9BFB5;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* ======== Loading ======== */
+.loading-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #BCAAA4;
+}

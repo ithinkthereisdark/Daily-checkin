@@ -2,6 +2,7 @@ const db = wx.cloud.database();
 const app = getApp();
 const { ensureEmojiLibrary } = require('../../utils/emoji');
 const { getAll } = require('../../utils/db');
+const { revokeByActionId } = require('../../utils/points');
 const _ = db.command;
 
 
@@ -324,6 +325,7 @@ Page({
         if (res.confirm) {
           db.collection('transactions').doc(tx._id).remove()
             .then(() => {
+              revokeByActionId(tx._id, app.globalData.nickName);
               wx.showToast({ title: '已删除', icon: 'success' });
               this.hideDetail();
               this.loadTransactions();

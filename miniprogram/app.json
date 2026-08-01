@@ -1,8 +1,9 @@
 {
   "pages": [
     "pages/checkin/checkin",
-    "pages/accounting/accounting",
     "pages/history/history",
+    "pages/accounting/accounting",
+    "pages/points/points",
     "pages/detail/detail",
     "pages/tools/tools",
     "pages/tools/audio-trim/index",
@@ -30,22 +31,22 @@
         "selectedIconPath": "images/icons/checkin-active.png"
       },
       {
-        "pagePath": "pages/accounting/accounting",
-        "text": "记账",
-        "iconPath": "images/icons/accounting.png",
-        "selectedIconPath": "images/icons/accounting-active.png"
-      },
-      {
         "pagePath": "pages/history/history",
         "text": "记录",
         "iconPath": "images/icons/history.png",
         "selectedIconPath": "images/icons/history-active.png"
       },
       {
-        "pagePath": "pages/tools/tools",
-        "text": "小工具",
-        "iconPath": "images/icons/tools.png",
-        "selectedIconPath": "images/icons/tools-active.png"
+        "pagePath": "pages/accounting/accounting",
+        "text": "记账",
+        "iconPath": "images/icons/accounting.png",
+        "selectedIconPath": "images/icons/accounting-active.png"
+      },
+      {
+        "pagePath": "pages/points/points",
+        "text": "积分",
+        "iconPath": "images/icons/points.png",
+        "selectedIconPath": "images/icons/points-active.png"
       }
     ]
   },

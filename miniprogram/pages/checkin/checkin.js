@@ -2,6 +2,7 @@ const db = wx.cloud.database();
 const app = getApp();
 const { getAll } = require('../../utils/db');
 const { ensureEmojiLibrary } = require('../../utils/emoji');
+const { awardCheckin, maybeAwardTaskCompletion, revokeByActionId } = require('../../utils/points');
 
 function todayStr() {
   const d = new Date();
@@ -131,7 +132,10 @@ Page({
 
     if (task.checkedInToday) {
       db.collection('checkins').doc(task.todayDoc._id).remove()
-        .then(() => { wx.showToast({ title: '已取消', icon: 'none' }); })
+        .then(() => {
+          revokeByActionId(task.todayDoc._id, app.globalData.nickName);
+          wx.showToast({ title: '已取消', icon: 'none' });
+        })
         .catch(() => { wx.showToast({ title: '取消失败', icon: 'none' }); })
         .finally(() => { this.loadData(); });
     } else {
@@ -150,7 +154,11 @@ Page({
           images: [],
           createTime: new Date()
         }
-      }).then(() => { wx.showToast({ title: '已打卡', icon: 'success' }); })
+      }).then((res) => {
+        const plan = awardCheckin(res._id, app.globalData.nickName, todayStr(), task.name);
+        maybeAwardTaskCompletion(task._id, app.globalData.nickName, task.targetCount, task.name);
+        wx.showToast({ title: '已打卡 +' + (plan.base + plan.critExtra) + (plan.critExtra ? ' ⚡' : ''), icon: 'success' });
+      })
         .catch(() => { wx.showToast({ title: '打卡失败', icon: 'none' }); })
         .finally(() => {
           this.loadData(() => {
@@ -368,9 +376,15 @@ Page({
             const delPromises = ids.length > 0
               ? ids.map(id => db.collection('checkins').doc(id).remove())
               : [];
+            // 撤回该任务所有打卡积分（防止删任务→重建刷分）
+            ids.forEach(id => revokeByActionId(id, app.globalData.nickName));
             return Promise.all(delPromises);
           })
-          .then(() => db.collection('tasks').doc(task._id).remove())
+          .then(() => {
+            // 撤回任务完成奖励（task_complete 的 actionId === taskId）
+            revokeByActionId(task._id, app.globalData.nickName);
+            return db.collection('tasks').doc(task._id).remove();
+          })
           .then(() => {
             wx.hideLoading();
             wx.showToast({ title: '已删除', icon: 'success' });
