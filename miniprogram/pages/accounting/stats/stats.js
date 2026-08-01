@@ -14,6 +14,8 @@ Page({
     pieData: [],
     trendDays: [],
     trendData: [],
+    expandedCategory: '',
+    rankDetail: [],
 
     // Month picker
     monthKey: '',
@@ -71,7 +73,7 @@ Page({
 
   switchTrendType(e) {
     const type = e.currentTarget.dataset.type;
-    this.setData({ trendType: type });
+    this.setData({ trendType: type, expandedCategory: '', rankDetail: [] });
     if (this._rawTransactions) {
       this.buildRankListFrom(this._rawTransactions);
       this.buildPieDataFrom(this._rawTransactions);
@@ -104,6 +106,7 @@ Page({
         .limit(limit)
     ).then(transactions => {
         this._rawTransactions = transactions;
+        this.setData({ expandedCategory: '', rankDetail: [] });
         this.calcSummary(transactions);
         this.buildTrendData(transactions);
         this.buildRankListFrom(transactions);
@@ -118,7 +121,8 @@ Page({
           this._rawTransactions = [];
           this.setData({
             totalIncome: 0, totalExpense: 0, totalBalance: 0,
-            trendDays: [], trendData: [], rankList: [], pieData: []
+            trendDays: [], trendData: [], rankList: [], pieData: [],
+            expandedCategory: '', rankDetail: []
           });
           return;
         }
@@ -177,8 +181,9 @@ Page({
     transactions.forEach(tx => {
       if (tx.type !== trendType) return;
       const key = tx.category;
-      if (!catMap[key]) catMap[key] = { category: key, emoji: tx.categoryEmoji, amount: 0 };
+      if (!catMap[key]) catMap[key] = { category: key, emoji: tx.categoryEmoji, amount: 0, count: 0 };
       catMap[key].amount += tx.amount;
+      catMap[key].count += 1;
     });
     const total = Object.values(catMap).reduce((s, c) => s + c.amount, 0);
     const rankList = Object.values(catMap)
@@ -189,6 +194,30 @@ Page({
       }))
       .sort((a, b) => b.amount - a.amount);
     this.setData({ rankList });
+  },
+
+  toggleRankDetail(e) {
+    const category = e.currentTarget.dataset.category;
+    if (!this._rawTransactions) return;
+
+    if (this.data.expandedCategory === category) {
+      this.setData({ expandedCategory: '', rankDetail: [] });
+      return;
+    }
+
+    const trendType = this.data.trendType;
+    const rankDetail = this._rawTransactions
+      .filter(tx => tx.type === trendType && tx.category === category)
+      .map(tx => ({
+        _id: tx._id,
+        dateShort: tx.date ? tx.date.slice(5) : '',
+        description: tx.description || '',
+        type: tx.type,
+        amount: tx.amount
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    this.setData({ expandedCategory: category, rankDetail });
   },
 
   buildPieDataFrom(transactions) {

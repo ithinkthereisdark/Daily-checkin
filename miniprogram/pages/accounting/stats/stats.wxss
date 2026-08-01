@@ -164,10 +164,21 @@
 }
 
 .rank-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+  min-width: 90rpx;
+  flex-shrink: 0;
+}
+
+.rank-name-text {
   font-size: 24rpx;
   color: #5D4037;
-  width: 80rpx;
-  flex-shrink: 0;
+}
+
+.rank-count {
+  font-size: 20rpx;
+  color: #BCAAA4;
 }
 
 .rank-bar-wrap {
@@ -199,6 +210,76 @@
   font-size: 24rpx;
   padding: 30rpx 0;
 }
+
+/* Rank expand */
+.rank-group {
+  border-radius: 12rpx;
+}
+
+.rank-item:active {
+  background: #FFF5EC;
+  border-radius: 12rpx;
+}
+
+.rank-chevron {
+  font-size: 24rpx;
+  color: #BCAAA4;
+  width: 28rpx;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.rank-chevron.open {
+  transform: rotate(90deg);
+}
+
+.rank-detail {
+  margin: 4rpx 0 4rpx 50rpx;
+  background: #FFF5EC;
+  border-radius: 16rpx;
+  padding: 8rpx 16rpx;
+}
+
+.rank-detail-row {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 8rpx;
+  border-bottom: 1rpx solid #F5F0EB;
+  gap: 12rpx;
+}
+
+.rank-detail-row:last-child {
+  border-bottom: none;
+}
+
+.rd-date {
+  font-size: 22rpx;
+  color: #8D7B72;
+  width: 90rpx;
+  flex-shrink: 0;
+}
+
+.rd-desc {
+  flex: 1;
+  font-size: 22rpx;
+  color: #8D7B72;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-amount {
+  font-size: 22rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  width: 110rpx;
+  text-align: right;
+}
+
+.rd-amount.income { color: #2E7D32; }
+.rd-amount.expense { color: #C62828; }
 
 /* Pie */
 .pie-wrap {
