@@ -27,6 +27,8 @@ Page({
     showCelebration: false,
     backfillTask: null,
     backfillToday: '',
+    taskGroups: [],
+    collapsed: { active: false, completed: true, expired: true, notStarted: true },
 
     // Management form state
     showNewForm: false,
@@ -78,23 +80,40 @@ Page({
         countMap[c.taskId] = (countMap[c.taskId] || 0) + 1;
       });
 
-      const merged = tasks.map(task => ({
-        ...task,
-        checkinCount: countMap[task._id] || 0,
-        checkedInToday: !!todayMap[task._id],
-        todayDoc: todayMap[task._id] || null,
-        isExpired: task.endDate < today,
-        isNotStarted: task.startDate > today
-      }));
-
-      merged.sort((a, b) => {
-        if (a.isExpired !== b.isExpired) return a.isExpired ? 1 : -1;
-        return a.createTime > b.createTime ? 1 : -1;
+      const merged = tasks.map(task => {
+        const isExpired = task.endDate < today;
+        const isNotStarted = task.startDate > today;
+        const checkinCount = countMap[task._id] || 0;
+        let taskState;
+        if (isNotStarted) taskState = 'notStarted';
+        else if (checkinCount >= task.targetCount) taskState = 'completed';
+        else if (isExpired) taskState = 'expired';
+        else taskState = 'active';
+        return {
+          ...task,
+          checkinCount,
+          checkedInToday: !!todayMap[task._id],
+          todayDoc: todayMap[task._id] || null,
+          isExpired,
+          isNotStarted,
+          taskState
+        };
       });
+
+      // 按状态分组（查询已按 createTime 升序，组内保持该顺序），空组不展示
+      const GROUPS = [
+        { key: 'active', label: '进行中', emoji: '🏃' },
+        { key: 'completed', label: '已完成', emoji: '✅' },
+        { key: 'expired', label: '已过期未完成', emoji: '⏰' },
+        { key: 'notStarted', label: '未开始', emoji: '📅' }
+      ];
+      const taskGroups = GROUPS
+        .map(g => ({ ...g, tasks: merged.filter(t => t.taskState === g.key) }))
+        .filter(g => g.tasks.length > 0);
 
       const activeTasks = merged.filter(t => !t.isExpired && !t.isNotStarted);
 
-      this.setData({ tasks: merged, activeTasks, loading: false });
+      this.setData({ tasks: merged, taskGroups, activeTasks, loading: false });
       if (onComplete) onComplete();
     }).catch(err => {
       console.error('加载数据失败', err);
@@ -282,6 +301,11 @@ Page({
 
   cancelForm() {
     this.setData({ showNewForm: false, editingId: '' });
+  },
+
+  toggleGroup(e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ ['collapsed.' + key]: !this.data.collapsed[key] });
   },
 
   onNameInput(e) {

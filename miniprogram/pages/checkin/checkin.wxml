@@ -106,15 +106,26 @@
       </view>
     </view>
 
-    <!-- Task list -->
-    <view wx:if="{{tasks.length === 0 && !showNewForm}}" class="empty">
+    <!-- Task list (grouped by state) -->
+    <view wx:if="{{taskGroups.length === 0 && !showNewForm}}" class="empty">
       <text class="empty-emoji">🐈</text>
       <text>还没有任务</text>
       <text class="empty-hint">点击「+ 新建」创建第一个任务吧~</text>
     </view>
 
-    <block wx:for="{{tasks}}" wx:key="_id">
-      <view class="task-row {{item.isExpired ? 'expired' : ''}}" bindlongpress="onLongPressTask" data-task="{{item}}">
+    <block wx:for="{{taskGroups}}" wx:for-item="group" wx:key="key">
+      <view class="task-group">
+        <view class="task-group-header" data-key="{{group.key}}" bindtap="toggleGroup">
+          <view class="task-group-left">
+            <text class="task-group-emoji">{{group.emoji}}</text>
+            <text class="task-group-title">{{group.label}}</text>
+            <text class="task-group-count">{{group.tasks.length}}</text>
+          </view>
+          <text class="task-group-arrow {{collapsed[group.key] ? '' : 'open'}}">▸</text>
+        </view>
+        <block wx:if="{{!collapsed[group.key]}}">
+          <block wx:for="{{group.tasks}}" wx:key="_id">
+      <view class="task-row {{item.isExpired || item.isNotStarted ? 'expired' : ''}}" bindlongpress="onLongPressTask" data-task="{{item}}">
         <!-- Normal display -->
         <block wx:if="{{editingId !== item._id}}">
           <view class="task-row-inner">
@@ -178,6 +189,9 @@
               <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">保存</button>
             </view>
           </view>
+        </block>
+      </view>
+        </block>
         </block>
       </view>
     </block>

@@ -269,12 +269,71 @@
   border-radius: 24rpx;
   padding: 0 24rpx;
   height: 56rpx;
-  line-height: 56rpx;
+  line-height: 1;
   font-weight: 500;
   min-width: unset;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  margin: 0;   /* 微信 button 默认 margin: auto，flex 里会居中，需重置 */
+}
+
+.new-btn::after {
+  display: none;
+}
+
+/* ====== Task Groups ====== */
+
+.task-group {
+  margin-bottom: 6rpx;
+}
+
+.task-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 10rpx;
+  border-bottom: 1rpx solid #F5F0EB;
+}
+
+.task-group-header:active {
+  background: #FFF5EC;
+  border-radius: 12rpx;
+}
+
+.task-group-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.task-group-emoji {
+  font-size: 28rpx;
+}
+
+.task-group-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #5D4037;
+}
+
+.task-group-count {
+  font-size: 20rpx;
+  color: #BCAAA4;
+  background: #F5F0EB;
+  border-radius: 16rpx;
+  padding: 2rpx 12rpx;
+}
+
+.task-group-arrow {
+  font-size: 22rpx;
+  color: #BCAAA4;
+  transition: transform 0.2s ease;
+}
+
+.task-group-arrow.open {
+  transform: rotate(90deg);
 }
 
 /* ====== Task Row ====== */
@@ -338,14 +397,15 @@
   color: #E8905C;
   padding: 0 16rpx;
   height: 56rpx;
-  line-height: 56rpx;
+  line-height: 1;
   border-radius: 16rpx;
   min-width: unset;
   text-align: center;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
+  margin: 0;
 }
 
 .action-btn.danger {
@@ -452,11 +512,12 @@
   min-width: unset;
   padding: 0 24rpx;
   height: 56rpx;
-  line-height: 56rpx;
-  display: inline-flex;
+  line-height: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 24rpx;
+  margin: 0;
 }
 
 .cancel-btn {
@@ -467,10 +528,11 @@
   min-width: unset;
   padding: 0 24rpx;
   height: 56rpx;
-  line-height: 56rpx;
-  display: inline-flex;
+  line-height: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
 }
 
 /* ====== Empty State ====== */
