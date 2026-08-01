@@ -18,19 +18,20 @@ A WeChat Mini Program (微信小程序) "花椒点点" for task-driven daily che
 ```
 miniprogram/
   app.js              ← Cloud init, nickname management (storage key 'nickName', default '无名')
-  app.json            ← 10 pages, 4-tab tabBar (打卡/记账/记录/小工具)
+  app.json            ← 11 pages, 4-tab tabBar (打卡/记录/记账/积分)
   app.wxss            ← Global styles
   utils/
     db.js             ← getAll(): cursor-paginated fetch-all helper (see below)
     emoji.js          ← PRESET_EMOJIS / PRESET_CATEGORIES + per-user seeders
   pages/
     checkin/          ← Tab 1: task grid + inline task CRUD + backfill + celebration
-    accounting/       ← Tab 2: month ledger view, grouped by date
+    history/          ← Tab 2: day timeline + month calendar views (read-only)
+    accounting/       ← Tab 3: month ledger view, grouped by date
       add/            ←   Transaction form: calculator input, category picker
       stats/          ←   Canvas 2D donut/bar charts, month picker
-    history/          ← Tab 3: day timeline + month calendar views (read-only)
+    points/           ← Tab 4: points balance + date-grouped ledger
     detail/           ← Non-tab: detailed check-in form (needDetail / backfill)
-    tools/            ← Tab 4: tool list (audio trim)
+    tools/            ← Non-tab: tool list (audio trim; 已移出 tabBar，保留注册)
       audio-trim/     ←   Upload → call audioTrim cloud function → preview result
     emoji-manager/    ← Non-tab: manage personal emoji library
     category-manager/ ← Non-tab: manage accounting categories
@@ -58,6 +59,7 @@ Dates are stored as `YYYY-MM-DD` strings for direct string comparison. All queri
 | `transactions` | ledgerId, type (`income`/`expense`), category, categoryEmoji, amount, date, description, nickName, createTime |
 | `categories` | name, emoji, type, isPreset, nickName, createTime — seeded from PRESET_CATEGORIES |
 | `emoji_library` | emoji, nickName, createTime — seeded from PRESET_EMOJIS |
+| `points_records` | nickName, action (`checkin`/`accounting`/`task_complete`/`crit`/`revoke`/`compensation`/`redeem`), actionId (来源文档 _id，task_complete 时是 taskId), points (+/-), date, note, createTime — 积分流水，余额 = 求和 |
 
 Legacy `records` and `expenses` collections are not referenced by any code — do not use them.
 
@@ -69,6 +71,7 @@ Legacy `records` and `expenses` collections are not referenced by any code — d
 - **Detail page**: shows an existing checkin for (taskId, date) if present → update mode; otherwise creates one. Uploads new images to `checkins/` cloud storage (MAX_IMAGES = 3), keeps already-uploaded `cloud://` fileIDs, guards expired/not-started dates.
 - **Client-side joining**: history and checkin pages fetch tasks + all checkins and join on `taskId` in the client (taskMap pattern). History has a day timeline (grouped by date) and a month calendar view (per-day all/partial/none state computed from checkins ∩ active tasks on that date).
 - **Accounting**: month-scoped query on `transactions` (`.where({ ledgerId, date: _.gte(monthStart).and(_.lte(monthEnd)) })`); `lastLedgerId` persisted in storage to restore the last-used ledger; a default ledger is auto-created when `ledgers` is empty. The add page uses a calculator-style expression evaluator (only `+`/`-`, `evaluate()` in add.js). Stats draws charts with Canvas 2D nodes (`type="2d"`, selector query `#trendCanvas`/`#pieCanvas`).
+- **Points (utils/points.js)**: 打卡 +1、记账 +1、暴击互斥掷骰（10%→+3，5%→+5，另记一条 crit）；任务完成奖励 = 非补打天数首次达 targetCount 时一次性 +天数×1（幂等）；补打 0 分；取消/删除按 actionId 求和精确扣回（旧数据自动跳过）；删任务时级联撤回其全部积分。积分页首次加载时自动执行历史补偿（无积分记录的旧打卡/记账打包为一条 `compensation` 记录，每人一次，幂等）。
 - **audioTrim cloud function**: client uploads the file to `audio-trim/input/`, calls `wx.cloud.callFunction({ name: 'audioTrim', data: { fileID, startTime, endTime, fileName } })`, and downloads the returned `fileID`. The function bundles a static ffmpeg binary, copies it to `/tmp` and chmods +x (the code dir is read-only), trims via stream-copy with a re-encode fallback, uploads to `audio-trim/output/`, and cleans up temp files. The client deletes the input file best-effort.
 
 ## Cloud environment

@@ -18,6 +18,7 @@ const ACTION_META = {
   task_complete: { emoji: '🎉', label: '任务完成' },
   crit:          { emoji: '⚡', label: '暴击' },
   revoke:        { emoji: '↩️', label: '撤销' },
+  compensation:  { emoji: '🪙', label: '积分补偿' },
   redeem:        { emoji: '🎁', label: '兑换' }
 };
 
@@ -119,6 +120,47 @@ function revokeByActionId(actionId, nickName) {
     .catch(err => console.error('[points] revoke failed', err));
 }
 
+/**
+ * 一次性历史积分补偿：统计该用户所有没有积分记录的打卡/记账，打包写入一条补偿记录。
+ * 幂等：records 中已有 compensation 记录则跳过；返回补偿的积分数（0 = 无需补偿）。
+ * 集合未创建（-502005）按空数据对待，不影响另一类数据的统计。
+ */
+function maybeCompensateLegacyPoints(nickName, records) {
+  if (records.some(r => r.action === 'compensation')) return Promise.resolve(0);
+  const awardedIds = new Set(records.map(r => r.actionId));
+
+  const safeGetAll = (queryFn) => getAll(queryFn).catch(err => {
+    if (err && err.errCode === -502005) return [];
+    throw err;
+  });
+  const countUncompensated = docs => docs.filter(d => !awardedIds.has(d._id)).length;
+
+  return Promise.all([
+    safeGetAll((limit) => db.collection('checkins').where({ nickName }).orderBy('_id', 'desc').limit(limit)),
+    safeGetAll((limit) => db.collection('transactions').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+  ]).then(([checkins, transactions]) => {
+    const checkinCount = countUncompensated(checkins);
+    const txCount = countUncompensated(transactions);
+    const total = checkinCount + txCount;
+    if (total === 0) return 0;
+    const parts = [];
+    if (checkinCount > 0) parts.push(`打卡 ${checkinCount} 次`);
+    if (txCount > 0) parts.push(`记账 ${txCount} 次`);
+    return writeRecord({
+      action: 'compensation',
+      actionId: '',
+      points: total,
+      date: todayStr(),
+      note: '历史记录补偿：' + parts.join(' + '),
+      nickName,
+      createTime: new Date()
+    }).then(() => total);
+  }).catch(err => {
+    console.error('[points] compensation failed', err);
+    return 0;
+  });
+}
+
 /** 由积分页全部记录计算头部汇总（今日/本月为净积分，撤销扣回也计入） */
 function getSummary(records) {
   const today = todayStr();
@@ -140,5 +182,6 @@ module.exports = {
   awardAccounting,
   maybeAwardTaskCompletion,
   revokeByActionId,
+  maybeCompensateLegacyPoints,
   getSummary
 };

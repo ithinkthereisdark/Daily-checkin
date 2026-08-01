@@ -1,7 +1,7 @@
 const db = wx.cloud.database();
 const app = getApp();
 const { getAll } = require('../../utils/db');
-const { ACTION_META, getSummary } = require('../../utils/points');
+const { ACTION_META, getSummary, maybeCompensateLegacyPoints } = require('../../utils/points');
 
 Page({
   data: {
@@ -20,7 +20,15 @@ Page({
     this.setData({ loading: true });
     const nickName = app.globalData.nickName;
 
-    getAll((limit) => db.collection('points_records').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+    // 集合尚未创建（-502005）→ 按空记录处理，让补偿逻辑顺带创建集合
+    const fetchRecords = () => getAll((limit) => db.collection('points_records').where({ nickName }).orderBy('_id', 'desc').limit(limit))
+      .catch(err => {
+        if (err && err.errCode === -502005) return [];
+        throw err;
+      });
+
+    fetchRecords()
+      .then(records => maybeCompensateLegacyPoints(nickName, records).then(() => fetchRecords()))
       .then(records => {
         const { balance, todayNet, monthNet } = getSummary(records);
 
@@ -46,11 +54,6 @@ Page({
         this.setData({ balance, todayNet, monthNet, groups, loading: false });
       })
       .catch(err => {
-        // 集合尚未创建（-502005）→ 空状态
-        if (err.errCode === -502005) {
-          this.setData({ balance: 0, todayNet: 0, monthNet: 0, groups: [], loading: false });
-          return;
-        }
         console.error('加载积分失败', err);
         this.setData({ loading: false });
         wx.showToast({ title: '加载失败', icon: 'none' });
