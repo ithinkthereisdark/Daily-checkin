@@ -1,4 +1,5 @@
 .claude/
 cloudfunctions/**/ffmpeg
 cloudfunctions/**/node_modules/
+snapshot/
 
