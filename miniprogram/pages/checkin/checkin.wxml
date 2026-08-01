@@ -57,7 +57,7 @@
   <view class="manage-card">
     <view class="manage-card-header">
       <text class="manage-card-title">📋 我的任务</text>
-      <button class="new-btn" size="mini" bindtap="openNewForm" disabled="{{showNewForm || editingId}}">+ 新建</button>
+      <button class="new-btn" size="mini" bindtap="openNewForm" disabled="{{showNewForm || editingId}}">+</button>
     </view>
 
     <!-- New task form -->
@@ -101,8 +101,8 @@
         </view>
       </view>
       <view class="form-actions">
-        <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
-        <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">创建</button>
+        <button class="cancel-btn" size="mini" bindtap="cancelForm">×</button>
+        <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✓</button>
       </view>
     </view>
 
@@ -137,8 +137,8 @@
               </view>
             </view>
             <view class="task-actions">
-              <button class="action-btn" size="mini" bindtap="openEditForm" data-task="{{item}}">✎ 编辑</button>
-              <button class="action-btn danger" size="mini" bindtap="deleteTask" data-task="{{item}}">✕ 删除</button>
+              <button class="action-btn" size="mini" bindtap="openEditForm" data-task="{{item}}">✎</button>
+              <button class="action-btn danger" size="mini" bindtap="deleteTask" data-task="{{item}}">✕</button>
             </view>
           </view>
         </block>
@@ -185,8 +185,8 @@
               </view>
             </view>
             <view class="form-actions">
-              <button class="cancel-btn" size="mini" bindtap="cancelForm">取消</button>
-              <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">保存</button>
+              <button class="cancel-btn" size="mini" bindtap="cancelForm">×</button>
+              <button type="primary" size="mini" bindtap="submitForm" loading="{{submitting}}">✓</button>
             </view>
           </view>
         </block>
