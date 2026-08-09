@@ -37,7 +37,6 @@
       <view class="red-card" wx:for="{{ongoing}}" wx:key="_id">
         <view class="red-top">
           <view class="red-info">
-            <image wx:if="{{item.wish && item.wish.images && item.wish.images.length > 0}}" class="red-thumb" src="{{item.wish.images[0]}}" mode="aspectFill"></image>
             <view class="red-text">
               <text class="red-title">{{item.wishTitle}}</text>
               <text class="red-points negative">-{{item.wishPoints}} 分</text>
@@ -67,11 +66,9 @@
       </view>
       <view wx:if="{{theirWishes.length === 0}}" class="section-empty">对方还没有心愿~</view>
       <view class="wish-card" wx:for="{{theirWishes}}" wx:key="_id">
-        <image wx:if="{{item.cover}}" class="wish-cover" src="{{item.cover}}" mode="aspectFill" data-url="{{item.cover}}" data-urls="{{item.images}}" bindtap="previewImage"></image>
         <view class="wish-body">
           <view class="wish-line">
             <text class="wish-title">{{item.title}}</text>
-            <text wx:if="{{item.imageCount > 1}}" class="img-count">{{item.imageCount}}张</text>
             <text class="wish-status {{item.statusClass}}">{{item.statusText}}</text>
           </view>
           <text wx:if="{{item.description}}" class="wish-desc">{{item.description}}</text>
@@ -95,11 +92,9 @@
       </view>
       <view wx:if="{{myWishes.length === 0}}" class="section-empty">还没有心愿，点右上角「+ 添加」许个愿吧~</view>
       <view class="wish-card" wx:for="{{myWishes}}" wx:key="_id" data-wish="{{item}}" bindlongpress="onEditWish" hover-class="wish-card-hover">
-        <image wx:if="{{item.cover}}" class="wish-cover" src="{{item.cover}}" mode="aspectFill" data-url="{{item.cover}}" data-urls="{{item.images}}" bindtap="previewImage"></image>
         <view class="wish-body">
           <view class="wish-line">
             <text class="wish-title">{{item.title}}</text>
-            <text wx:if="{{item.imageCount > 1}}" class="img-count">{{item.imageCount}}张</text>
             <text class="wish-status {{item.statusClass}}">{{item.statusText}}</text>
           </view>
           <text wx:if="{{item.description}}" class="wish-desc">{{item.description}}</text>

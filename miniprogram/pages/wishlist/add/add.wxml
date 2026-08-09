@@ -22,35 +22,6 @@
       ></textarea>
     </view>
 
-    <view class="form-item">
-      <text class="form-label">🖼 图片（最多 3 张）</text>
-      <view wx:if="{{imagePaths.length > 0}}" class="image-grid">
-        <view class="image-cell" wx:for="{{imagePaths}}" wx:key="*this">
-          <image
-            src="{{item}}"
-            mode="aspectFill"
-            class="preview-img"
-            data-url="{{item}}"
-            bindtap="previewImage"
-          ></image>
-          <view class="delete-btn" data-index="{{index}}" catchtap="removeImage">
-            <text class="delete-icon">✕</text>
-          </view>
-        </view>
-        <view
-          wx:if="{{imagePaths.length < 3}}"
-          class="image-cell image-add"
-          bindtap="chooseImage"
-        >
-          <text class="add-icon">+</text>
-          <text class="add-label">添加照片</text>
-        </view>
-      </view>
-      <view wx:else class="img-btn" bindtap="chooseImage">
-        <text>📷 添加照片</text>
-      </view>
-    </view>
-
     <view class="btn-group">
       <button type="primary" bindtap="submit" loading="{{submitting}}" disabled="{{submitting}}">
         {{isEdit ? '✏️ 保存修改' : '🎁 许下心愿'}}

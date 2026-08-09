@@ -80,8 +80,6 @@ Page({
           .filter(w => w.status === 'open' && w.nickName !== myName)
           .map(w => ({
             ...w,
-            cover: w.images && w.images.length ? w.images[0] : '',
-            imageCount: w.images ? w.images.length : 0,
             canPrice: canPrice(w, myName),
             ...wishStatus(w)
           }))
@@ -92,8 +90,6 @@ Page({
           .filter(w => w.status === 'open' && w.nickName === myName)
           .map(w => ({
             ...w,
-            cover: w.images && w.images.length ? w.images[0] : '',
-            imageCount: w.images ? w.images.length : 0,
             canRedeem: canRedeem(w, myName),
             lowBalance: balance < (w.points || 0),   // 余额不足置灰
             ...wishStatus(w)
@@ -136,11 +132,6 @@ Page({
 
   closeRedeemSuccess() {
     this.setData({ showRedeemSuccess: false });
-  },
-
-  previewImage(e) {
-    const { urls, url } = e.currentTarget.dataset;
-    wx.previewImage({ urls: urls, current: url });
   },
 
   // ===== 对方：定价 / 改价 =====

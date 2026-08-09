@@ -185,15 +185,6 @@
   min-width: 0;
 }
 
-.red-thumb {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 14rpx;
-  background: #F5F0EB;
-  flex-shrink: 0;
-  margin-right: 18rpx;
-}
-
 .red-text {
   display: flex;
   flex-direction: column;
@@ -291,15 +282,6 @@
   background: #FFF5EC;
 }
 
-.wish-cover {
-  width: 132rpx;
-  height: 132rpx;
-  border-radius: 14rpx;
-  background: #F5F0EB;
-  flex-shrink: 0;
-  margin-right: 20rpx;
-}
-
 .wish-body {
   flex: 1;
   min-width: 0;
@@ -336,15 +318,6 @@
 
 .wish-status.pricing { background: #FFF2EC; color: #E8905C; }
 .wish-status.ready { background: #E8F0FA; color: #3F6FB5; }
-
-.img-count {
-  font-size: 22rpx;
-  color: #BCAAA4;
-  background: #F5F0EB;
-  border-radius: 10rpx;
-  padding: 2rpx 12rpx;
-  flex-shrink: 0;
-}
 
 .wish-desc {
   font-size: 26rpx;

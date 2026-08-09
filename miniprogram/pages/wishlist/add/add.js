@@ -2,15 +2,12 @@ const app = getApp();
 const db = wx.cloud.database();
 const { addWish } = require('../../../utils/wishes');
 
-const MAX_IMAGES = 3;
-
 Page({
   data: {
     isEdit: false,        // 编辑模式（从心愿卡片长按进入）
     editingId: '',
     title: '',
     description: '',
-    imagePaths: [],   // mixed: cloud:// fileIDs (already uploaded) + temp paths (newly selected)
     submitting: false,
     deleting: false
   },
@@ -27,8 +24,7 @@ Page({
         const w = res.data;
         this.setData({
           title: w.title,
-          description: w.description || '',
-          imagePaths: w.images || []
+          description: w.description || ''
         });
       })
       .catch(err => {
@@ -46,35 +42,8 @@ Page({
     this.setData({ description: e.detail.value });
   },
 
-  chooseImage() {
-    const remaining = MAX_IMAGES - this.data.imagePaths.length;
-    if (remaining <= 0) return;
-
-    wx.chooseMedia({
-      count: remaining,
-      mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const newPaths = res.tempFiles.map(f => f.tempFilePath);
-        this.setData({ imagePaths: [...this.data.imagePaths, ...newPaths] });
-      }
-    });
-  },
-
-  removeImage(e) {
-    const index = e.currentTarget.dataset.index;
-    const imagePaths = [...this.data.imagePaths];
-    imagePaths.splice(index, 1);
-    this.setData({ imagePaths });
-  },
-
-  previewImage(e) {
-    const { url } = e.currentTarget.dataset;
-    wx.previewImage({ urls: this.data.imagePaths, current: url });
-  },
-
   submit() {
-    const { title, description, imagePaths, submitting, isEdit, editingId } = this.data;
+    const { title, description, submitting, isEdit, editingId } = this.data;
     if (submitting) return;
 
     if (!title.trim()) {
@@ -85,45 +54,33 @@ Page({
     this.setData({ submitting: true });
     wx.showLoading({ title: '保存中' });
 
-    // 区分已上传的 cloud fileID 与待上传的临时路径（detail 页同款模式）
-    const cloudFiles = imagePaths.filter(p => p.startsWith('cloud://'));
-    const newPaths = imagePaths.filter(p => !p.startsWith('cloud://'));
-
-    const uploadPromises = newPaths.map(path =>
-      wx.cloud.uploadFile({
-        cloudPath: 'wishes/' + Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg',
-        filePath: path
-      })
-    );
-
-    Promise.allSettled(uploadPromises).then(results => {
-      const uploadedFileIDs = results
-        .filter(r => r.status === 'fulfilled')
-        .map(r => r.value.fileID);
-      if (uploadedFileIDs.length < newPaths.length) {
-        console.warn(`${newPaths.length - uploadedFileIDs.length} images failed to upload`);
-      }
-      const images = [...cloudFiles, ...uploadedFileIDs];
-
-      if (isEdit) {
-        // 编辑后清除定价（内容可能已变），需要对方重新定价
-        return db.collection('wishes').doc(editingId).update({
-          data: { title: title.trim(), description: description.trim(), images, points: null }
-        });
-      }
-      return addWish(app.globalData.nickName, {
-        title: title.trim(),
-        description: description.trim(),
-        images
+    if (isEdit) {
+      // 编辑后清除定价（内容可能已变），需要对方重新定价
+      return db.collection('wishes').doc(editingId).update({
+        data: { title: title.trim(), description: description.trim(), points: null }
+      }).then(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '已保存', icon: 'success' });
+        setTimeout(() => { wx.navigateBack(); }, 600);
+      }).catch(err => {
+        wx.hideLoading();
+        console.error('保存心愿失败', err);
+        wx.showToast({ title: '保存失败', icon: 'none' });
+        this.setData({ submitting: false });
       });
+    }
+
+    addWish(app.globalData.nickName, {
+      title: title.trim(),
+      description: description.trim()
     }).then(() => {
       wx.hideLoading();
-      wx.showToast({ title: isEdit ? '已保存' : '心愿已添加', icon: 'success' });
+      wx.showToast({ title: '心愿已添加', icon: 'success' });
       setTimeout(() => { wx.navigateBack(); }, 600);
     }).catch(err => {
       wx.hideLoading();
-      console.error('保存心愿失败', err);
-      wx.showToast({ title: '保存失败', icon: 'none' });
+      console.error('添加心愿失败', err);
+      wx.showToast({ title: '添加失败', icon: 'none' });
       this.setData({ submitting: false });
     });
   },
