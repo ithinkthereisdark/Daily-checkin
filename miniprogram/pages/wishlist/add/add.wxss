@@ -131,6 +131,9 @@
 .btn-group button {
   flex: 1;
   margin: 0;
+  font-size: 30rpx;       /* 统一两个按钮字号（primary 默认 18px 偏大） */
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 /* 心愿删除按钮：与保存修改并排（编辑模式）。
@@ -139,6 +142,4 @@
   background: #F5F0EB;
   color: #C62828;
   border-radius: 16rpx;
-  font-size: 28rpx;
-  font-weight: 600;
 }
