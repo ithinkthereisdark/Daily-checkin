@@ -2,6 +2,7 @@ const db = wx.cloud.database();
 const app = getApp();
 const { getAll } = require('../../utils/db');
 const { ACTION_META, getSummary, maybeCompensateLegacyPoints } = require('../../utils/points');
+const { fetchWishes, fetchRedemptions } = require('../../utils/wishes');
 
 Page({
   data: {
@@ -9,7 +10,14 @@ Page({
     todayNet: 0,
     monthNet: 0,
     groups: [],
+    wishTotal: 0,      // 心愿单数量（右卡主数字）
+    wishPrice: 0,      // 待定价数（对方心愿未定价）
+    wishShip: 0,       // 待发货数（pending 核销单）
     loading: true
+  },
+
+  goWishlist() {
+    wx.navigateTo({ url: '/pages/wishlist/wishlist' });
   },
 
   onShow() {
@@ -29,8 +37,12 @@ Page({
 
     fetchRecords()
       .then(records => maybeCompensateLegacyPoints(nickName, records).then(() => fetchRecords()))
-      .then(records => {
+      .then(records => Promise.all([records, fetchWishes(), fetchRedemptions()]))
+      .then(([records, wishes, reds]) => {
         const { balance, todayNet, monthNet } = getSummary(records);
+
+        // ===== 右卡心愿单统计 =====
+        const needPrice = wishes.filter(w => w.status === 'open' && w.points == null && w.nickName !== nickName).length;
 
         const dateMap = {};
         records.forEach(r => {
@@ -51,7 +63,13 @@ Page({
             return dateMap[d];
           });
 
-        this.setData({ balance, todayNet, monthNet, groups, loading: false });
+        this.setData({
+          balance, todayNet, monthNet, groups,
+          wishTotal: wishes.length,
+          wishPrice: needPrice,
+          wishShip: reds.filter(r => r.status === 'pending').length,
+          loading: false
+        });
       })
       .catch(err => {
         console.error('加载积分失败', err);

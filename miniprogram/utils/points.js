@@ -97,6 +97,16 @@ function maybeAwardTaskCompletion(taskId, nickName, targetCount, taskName) {
 }
 
 /**
+ * 心愿核销扣分：写一条 action='redeem' 的负分记录。
+ * 与 awardCheckin 不同：不吞错，返回真实 promise，供调用方在失败时回滚核销单。
+ */
+function awardRedeem(redemptionId, nickName, points, date, note) {
+  return db.collection('points_records').add({
+    data: { action: 'redeem', actionId: redemptionId, points: -points, date, note, nickName, createTime: new Date() }
+  });
+}
+
+/**
  * 按 actionId 精确扣回：求和该来源的所有积分记录（含暴击），写一条负的 revoke 记录。
  * 和为 0（旧数据/补打/已撤销）→ no-op，不写 0 分记录。保证该来源净额恒为 0。
  */
@@ -180,6 +190,7 @@ module.exports = {
   ACTION_META,
   awardCheckin,
   awardAccounting,
+  awardRedeem,
   maybeAwardTaskCompletion,
   revokeByActionId,
   maybeCompensateLegacyPoints,

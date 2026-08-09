@@ -1,0 +1,159 @@
+<view class="page">
+  <scroll-view scroll-y class="list" wx:if="{{!loading}}">
+    <!-- ===== 顶部统计 ===== -->
+    <view class="stats-card">
+      <view class="refresh-btn {{refreshing ? 'spinning' : ''}}" bindtap="refreshData" hover-class="refresh-btn-hover">
+        <text class="refresh-icon">↻</text>
+      </view>
+      <view class="stat-cell">
+        <text class="stat-num">{{stats.total}}</text>
+        <text class="stat-label">心愿总数</text>
+      </view>
+      <view class="stat-sep"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{stats.redeemable}}</text>
+        <text class="stat-label">可核销</text>
+      </view>
+      <view class="stat-sep"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{stats.pendingShip}}</text>
+        <text class="stat-label">待发货</text>
+      </view>
+      <view class="stat-sep"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{stats.received}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+    </view>
+
+    <!-- ===== 进行中核销 ===== -->
+    <view wx:if="{{ongoing.length > 0}}" class="section">
+      <view class="section-header">
+        <view class="header-left">
+          <text class="section-title">🔔 进行中</text>
+          <text class="header-count">{{ongoing.length}}</text>
+        </view>
+      </view>
+      <view class="red-card" wx:for="{{ongoing}}" wx:key="_id">
+        <view class="red-top">
+          <view class="red-info">
+            <image wx:if="{{item.wish && item.wish.images && item.wish.images.length > 0}}" class="red-thumb" src="{{item.wish.images[0]}}" mode="aspectFill"></image>
+            <view class="red-text">
+              <text class="red-title">{{item.wishTitle}}</text>
+              <text class="red-points negative">-{{item.wishPoints}} 分</text>
+            </view>
+          </view>
+          <text class="status-tag {{item.status}}">{{item.meta.emoji}} {{item.meta.label}}</text>
+        </view>
+        <view class="code-box">
+          <text class="code-label">取货凭证</text>
+          <text class="code-value">{{item.code}}</text>
+        </view>
+        <view class="red-actions">
+          <view wx:if="{{item.canShip}}" class="w-btn primary" data-red="{{item}}" bindtap="onShip">📦 发货</view>
+          <view wx:if="{{item.canReceive}}" class="w-btn primary" data-red="{{item}}" bindtap="onReceive">✅ 确认收货</view>
+          <view wx:if="{{item.canCancel}}" class="w-btn ghost" data-red="{{item}}" bindtap="onCancel">↩️ 取消核销</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 对方的心愿（始终显示）===== -->
+    <view class="section">
+      <view class="section-header">
+        <view class="header-left">
+          <text class="section-title">💝 对方的心愿</text>
+          <text class="header-count">{{theirWishes.length}}</text>
+        </view>
+      </view>
+      <view wx:if="{{theirWishes.length === 0}}" class="section-empty">对方还没有心愿~</view>
+      <view class="wish-card" wx:for="{{theirWishes}}" wx:key="_id">
+        <image wx:if="{{item.cover}}" class="wish-cover" src="{{item.cover}}" mode="aspectFill" data-url="{{item.cover}}" data-urls="{{item.images}}" bindtap="previewImage"></image>
+        <view class="wish-body">
+          <view class="wish-line">
+            <text class="wish-title">{{item.title}}</text>
+            <text wx:if="{{item.imageCount > 1}}" class="img-count">{{item.imageCount}}张</text>
+            <text class="wish-status {{item.statusClass}}">{{item.statusText}}</text>
+          </view>
+          <text wx:if="{{item.description}}" class="wish-desc">{{item.description}}</text>
+          <view class="wish-bottom">
+            <text wx:if="{{item.points == null}}" class="points-hint">待定价</text>
+            <text wx:else class="points-hint">已定价 {{item.points}} 分</text>
+            <view wx:if="{{item.canPrice}}" class="w-btn small primary" data-wish="{{item}}" bindtap="onPrice">{{item.points == null ? '💰 定价' : '✏️ 改价'}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 自己的心愿（始终显示，+ 添加永远可见）===== -->
+    <view class="section">
+      <view class="section-header">
+        <view class="header-left">
+          <text class="section-title">🎁 自己的心愿</text>
+          <text class="header-count">{{myWishes.length}}</text>
+        </view>
+        <view class="w-btn small primary" bindtap="goAdd">+ 添加</view>
+      </view>
+      <view wx:if="{{myWishes.length === 0}}" class="section-empty">还没有心愿，点右上角「+ 添加」许个愿吧~</view>
+      <view class="wish-card" wx:for="{{myWishes}}" wx:key="_id" data-wish="{{item}}" bindlongpress="onEditWish" hover-class="wish-card-hover">
+        <image wx:if="{{item.cover}}" class="wish-cover" src="{{item.cover}}" mode="aspectFill" data-url="{{item.cover}}" data-urls="{{item.images}}" bindtap="previewImage"></image>
+        <view class="wish-body">
+          <view class="wish-line">
+            <text class="wish-title">{{item.title}}</text>
+            <text wx:if="{{item.imageCount > 1}}" class="img-count">{{item.imageCount}}张</text>
+            <text class="wish-status {{item.statusClass}}">{{item.statusText}}</text>
+          </view>
+          <text wx:if="{{item.description}}" class="wish-desc">{{item.description}}</text>
+          <view class="wish-bottom">
+            <text wx:if="{{item.points == null}}" class="points-hint">待对方定价</text>
+            <text wx:else class="points-hint">已定价 {{item.points}} 分</text>
+            <view class="wish-actions">
+              <view wx:if="{{item.canRedeem && !item.lowBalance}}" class="w-btn small primary" data-wish="{{item}}" bindtap="onRedeem">🎁 核销</view>
+              <view wx:elif="{{item.canRedeem && item.lowBalance}}" class="w-btn small disabled">积分不足</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 历史 ===== -->
+    <view wx:if="{{history.length > 0}}" class="section">
+      <view class="section-header">
+        <view class="header-left">
+          <text class="section-title">📜 历史</text>
+          <text class="header-count">{{history.length}}</text>
+        </view>
+      </view>
+      <view class="his-card">
+        <view class="his-row" wx:for="{{history}}" wx:key="_id">
+          <view class="his-info">
+            <view class="his-title-line">
+              <text class="his-title">{{item.wishTitle}}</text>
+              <text class="his-owner">{{item.wishNickName}}</text>
+            </view>
+            <text class="his-meta">{{item.meta.emoji}} {{item.meta.label}} · {{item.timeShort}}</text>
+          </view>
+          <text class="his-points {{item.status === 'received' ? 'negative' : 'positive'}}">{{item.status === 'received' ? '-' : '+'}}{{item.wishPoints}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="list-bottom"></view>
+  </scroll-view>
+
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 核销成功凭证弹层 -->
+  <view wx:if="{{showRedeemSuccess}}" class="redeem-overlay">
+    <view class="redeem-box">
+      <text class="redeem-emoji">🎉</text>
+      <text class="redeem-title">核销成功</text>
+      <text class="redeem-code-label">取货凭证</text>
+      <text class="redeem-code">{{redeemCode}}</text>
+      <text class="redeem-points">已扣 {{redeemPoints}} 积分</text>
+      <text class="redeem-hint">等对方发货吧~</text>
+      <view class="redeem-btn" bindtap="closeRedeemSuccess">知道了</view>
+    </view>
+  </view>
+</view>

@@ -10,7 +10,9 @@
     "pages/accounting/add/add",
     "pages/accounting/stats/stats",
     "pages/emoji-manager/emoji-manager",
-    "pages/category-manager/category-manager"
+    "pages/category-manager/category-manager",
+    "pages/wishlist/wishlist",
+    "pages/wishlist/add/add"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -6,16 +6,66 @@
 }
 
 /* ======== Balance Header ======== */
+.points-header-row {
+  display: flex;
+  align-items: stretch;
+  margin: 20rpx;
+  gap: 16rpx;          /* 两卡间距，避免阴影在交界处重叠 */
+  flex-shrink: 0;
+}
+
 .points-header {
   background: #FFFBF7;
   border-radius: 20rpx;
   box-shadow: 0 2rpx 14rpx rgba(180,140,120,0.06);
-  margin: 20rpx;
   padding: 32rpx 24rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
+}
+
+.points-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 右卡与左卡（.points-header）同构：label → 大数字 → 两格统计 */
+.wish-entry {
+  flex: 1;
+  min-width: 0;
+  background: #FFFBF7;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 14rpx rgba(180,140,120,0.06);   /* 与左卡同款阴影，无描边 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 24rpx;   /* 与左卡 padding 一致 */
+  box-sizing: border-box;
+}
+
+.wish-entry:active {
+  background: #FFF5EC;
+}
+
+.wish-entry-label {
+  font-size: 24rpx;      /* 同 .points-label */
+  color: #8D7B72;
+}
+
+.wish-entry-num {
+  font-size: 88rpx;      /* 同 .points-balance */
+  font-weight: 700;
+  color: #E8905C;
+  line-height: 1.2;
+  margin: 8rpx 0 16rpx;
+}
+
+/* 两格统计：与左卡 stat-item/stat-divider 对称复用 */
+.wish-entry-stats {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
 }
 
 .points-label {
