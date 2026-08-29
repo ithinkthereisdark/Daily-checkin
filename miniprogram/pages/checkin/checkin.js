@@ -254,6 +254,8 @@ Page({
       })
       .then(() => {
         if (task.needDetail) return;
+        // 补打也计入完成进度：补打使任务首次达到 targetCount 时同样发完成奖励
+        maybeAwardTaskCompletion(task._id, app.globalData.nickName, task.targetCount, task.name);
         wx.showToast({ title: '已补打', icon: 'success' });
         this.loadData(() => {
           this.checkAllDoneAndCelebrate();

@@ -154,11 +154,15 @@ Page({
       return db.collection('checkins').add({ data }).then(res => res._id);
     }).then((newId) => {
       wx.hideLoading();
-      if (newId && !backfillDate) {
-        // 新增打卡才加分；编辑/补打不加
-        const plan = awardCheckin(newId, app.globalData.nickName, today, task ? task.name : '');
+      if (newId) {
+        // 新增打卡（含补打）：补打单次 0 分，但补打也计入任务完成进度
+        if (!backfillDate) {
+          const plan = awardCheckin(newId, app.globalData.nickName, today, task ? task.name : '');
+          wx.showToast({ title: '打卡成功 +' + (plan.base + plan.critExtra) + (plan.critExtra ? ' ⚡' : ''), icon: 'success' });
+        } else {
+          wx.showToast({ title: '打卡成功', icon: 'success' });
+        }
         if (task) maybeAwardTaskCompletion(taskId, app.globalData.nickName, task.targetCount, task.name);
-        wx.showToast({ title: '打卡成功 +' + (plan.base + plan.critExtra) + (plan.critExtra ? ' ⚡' : ''), icon: 'success' });
       } else {
         wx.showToast({ title: isUpdate ? '已更新' : '打卡成功', icon: 'success' });
       }

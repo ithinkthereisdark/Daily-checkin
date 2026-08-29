@@ -9,7 +9,7 @@ const CRIT_RATE_3 = 0.10;          // 10% 概率暴击 +3
 const CRIT_AMOUNT_3 = 3;
 const CRIT_RATE_5 = 0.05;          // 5% 概率暴击 +5
 const CRIT_AMOUNT_5 = 5;
-const COMPLETION_PER_DAY = 1;      // 任务完成奖励 = 非补打天数 × 该值
+const COMPLETION_PER_DAY = 1;      // 任务完成奖励 = 打卡天数（含补打）× 该值
 
 // 各动作在积分页的展示（action 是数据模型的一部分，'redeem' 为兑换预留）
 const ACTION_META = {
@@ -67,15 +67,15 @@ function awardAccounting(actionId, nickName, date, note) {
 }
 
 /**
- * 任务完成奖励：非补打打卡天数首次达到 targetCount 时，一次性发 天数×COMPLETION_PER_DAY 分。
+ * 任务完成奖励：打卡数（正常+补打全部计入）首次达到 targetCount 时，一次性发 打卡数×COMPLETION_PER_DAY 分。
  * 幂等：已有 task_complete 记录（actionId=taskId）则跳过，防止 完成→取消→再完成 重复发奖。
  */
 function maybeAwardTaskCompletion(taskId, nickName, targetCount, taskName) {
   if (!targetCount || targetCount <= 0) return Promise.resolve();
   return getAll((limit) => db.collection('checkins').where({ taskId, nickName }).orderBy('_id', 'desc').limit(limit))
     .then(checkins => {
-      const nonBackfill = checkins.filter(c => !c.isBackfill).length;
-      if (nonBackfill < targetCount) return;
+      const total = checkins.length; // 计数口径与打卡页一致：正常+补打全部计入
+      if (total < targetCount) return;
       return db.collection('points_records')
         .where({ nickName, action: 'task_complete', actionId: taskId })
         .limit(1)
@@ -85,7 +85,7 @@ function maybeAwardTaskCompletion(taskId, nickName, targetCount, taskName) {
           return writeRecord({
             action: 'task_complete',
             actionId: taskId,
-            points: nonBackfill * COMPLETION_PER_DAY,
+            points: total * COMPLETION_PER_DAY,
             date: todayStr(),
             note: taskName,
             nickName,
